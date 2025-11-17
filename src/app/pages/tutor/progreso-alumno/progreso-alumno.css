@@ -1,0 +1,710 @@
+/* progreso-alumno.css */
+.progreso-alumno-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f4f6;
+  border-top-color: #ec4899;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Header del Alumno */
+.alumno-header {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: #e5e7eb;
+}
+
+.btn-back svg {
+  width: 16px;
+  height: 16px;
+}
+
+.alumno-header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.alumno-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.alumno-nombre-grande {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.alumno-correo-grande {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stats Overview */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card-overview {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon-overview {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon-overview svg {
+  width: 28px;
+  height: 28px;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.stat-data {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value-large {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label-overview {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Tabs */
+.tabs-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.tab-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-button:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.tab-button.active {
+  background: #ec4899;
+  color: white;
+}
+
+/* Tab Content */
+.tab-content {
+  min-height: 400px;
+}
+
+.section-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+}
+
+.section-title svg {
+  width: 20px;
+  height: 20px;
+  color: #ec4899;
+}
+
+/* Calificaciones Detail Grid */
+.calificaciones-detail-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.calificacion-item-detail {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.calificacion-header-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.calificacion-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.calificacion-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.stars-container-small {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1rem;
+}
+
+.star-full { color: #fbbf24; }
+.star-half { color: #fbbf24; opacity: 0.5; }
+.star-empty { color: #d1d5db; }
+
+/* Operations Grid */
+.operations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.operation-stat {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.operation-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.despegue-icon {
+  background: #dbeafe;
+}
+
+.despegue-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #3b82f6;
+  stroke-width: 2;
+}
+
+.aterrizaje-icon {
+  background: #d1fae5;
+}
+
+.aterrizaje-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #10b981;
+  stroke-width: 2;
+}
+
+.operation-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.operation-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.operation-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Maniobras Section */
+.maniobras-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.maniobra-grupo-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid;
+}
+
+.grupo-básico {
+  color: #3b82f6;
+  border-color: #dbeafe;
+}
+
+.grupo-intermedio {
+  color: #f59e0b;
+  border-color: #fef3c7;
+}
+
+.grupo-avanzado {
+  color: #ef4444;
+  border-color: #fee2e2;
+}
+
+.maniobras-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.maniobra-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-básico {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-intermedio {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.badge-avanzado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty-maniobras {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Timeline */
+.timeline-container {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -1.75rem;
+  top: 0.25rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #e5e7eb;
+}
+
+.timeline-content {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.timeline-date {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-calificaciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cal-mini {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.cal-label {
+  font-weight: 600;
+}
+
+.cal-value {
+  color: #1f2937;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+.timeline-general {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stars-container-tiny {
+  display: flex;
+  gap: 0.125rem;
+  font-size: 0.875rem;
+}
+
+/* Bitácora Card */
+.bitacora-card {
+  background: white;
+  border: 2px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.bitacora-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.bitacora-fecha,
+.bitacora-avioneta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.bitacora-fecha svg,
+.bitacora-avioneta svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bitacora-calificaciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cal-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.cal-name {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.cal-num {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: white;
+  background: #6b7280;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.bitacora-observaciones,
+.bitacora-areas,
+.bitacora-logros {
+  margin-bottom: 1rem;
+}
+
+.bitacora-observaciones h4,
+.bitacora-areas h4,
+.bitacora-logros h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+}
+
+.bitacora-observaciones p,
+.bitacora-areas p,
+.bitacora-logros p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Vuelo Próximo Card */
+.vuelo-proximo-card {
+  background: white;
+  border: 2px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.vuelo-fecha-hora {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.fecha-grande {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.hora-grande {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.vuelo-info-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.info-item-proximo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.info-item-proximo svg {
+  width: 16px;
+  height: 16px;
+}
+
+.estado-badge-proximo {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.estado-programado {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-en-curso {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.vuelo-observaciones-proximo {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.vuelo-observaciones-proximo p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* Empty States */
+.empty-state-tab {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+}
+
+.empty-icon-tab {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  stroke: #d1d5db;
+  stroke-width: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .progreso-alumno-container {
+    padding: 1rem;
+  }
+
+  .alumno-header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs-container {
+    flex-direction: column;
+  }
+
+  .tab-button {
+    min-width: 100%;
+  }
+
+  .bitacora-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .timeline-container {
+    padding-left: 1.5rem;
+  }
+}

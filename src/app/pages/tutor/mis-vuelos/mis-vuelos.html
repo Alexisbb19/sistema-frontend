@@ -1,0 +1,613 @@
+<div class="mis-vuelos-container">
+  <!-- Header con estadísticas rápidas -->
+  <div class="quick-stats">
+    <div class="stat-card stat-hoy">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ vuelosHoy }}</h3>
+        <p class="stat-label">Vuelos Hoy</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-semana">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ vuelosSemana }}</h3>
+        <p class="stat-label">Esta Semana</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-pendientes">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ vuelosPendientes }}</h3>
+        <p class="stat-label">Pendientes</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Fecha:</label>
+        <input
+          type="date"
+          [(ngModel)]="filterFecha"
+          (change)="onFilterChange()"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Estado:</label>
+        <select [(ngModel)]="filterEstado" (change)="onFilterChange()" class="filter-select">
+          <option value="">Todos</option>
+          <option value="Programado">Programados</option>
+          <option value="En Curso">En Curso</option>
+          <option value="Completado">Completados</option>
+          <option value="Cancelado">Cancelados</option>
+        </select>
+      </div>
+
+      <button class="btn-clear-filters" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Limpiar
+      </button>
+
+      <button class="btn-refresh" (click)="loadVuelos()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando vuelos...</p>
+  </div>
+
+  <!-- Lista de vuelos -->
+  <div *ngIf="!loading" class="vuelos-list">
+    <div *ngFor="let vuelo of vuelos" class="vuelo-card" [ngClass]="getCardClass(vuelo.estado)">
+      <div class="card-left-bar"></div>
+      
+      <div class="card-header">
+        <div class="card-date-time">
+          <div class="date-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>{{ formatDate(vuelo.fecha) }}</span>
+          </div>
+          <div class="time-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>{{ vuelo.hora_inicio }} - {{ vuelo.hora_fin || 'N/A' }}</span>
+          </div>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(vuelo.estado)">
+          {{ vuelo.estado }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="alumno-info">
+          <div class="alumno-avatar">
+            {{ getInitials(vuelo.alumno?.nombre, vuelo.alumno?.apellido) }}
+          </div>
+          <div class="alumno-details">
+            <span class="alumno-label">Alumno:</span>
+            <span class="alumno-name">{{ vuelo.alumno?.nombre }} {{ vuelo.alumno?.apellido }}</span>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+              <path d="M12 8v8M8 12h8"/>
+            </svg>
+            <div class="info-content">
+              <span class="info-label">Avioneta</span>
+              <span class="info-value">{{ vuelo.avioneta?.codigo }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="vuelo.horas_voladas">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <div class="info-content">
+              <span class="info-label">Horas Voladas</span>
+              <span class="info-value">{{ vuelo.horas_voladas }} hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="vuelo.observaciones" class="observaciones">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p>{{ vuelo.observaciones }}</p>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button 
+          class="btn-card btn-action"
+          *ngIf="vuelo.estado === 'Programado'"
+          (click)="iniciarVuelo(vuelo)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          Iniciar Vuelo
+        </button>
+
+        <button 
+          class="btn-card btn-complete"
+          *ngIf="vuelo.estado === 'En Curso'"
+          (click)="completarVuelo(vuelo)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Completar
+        </button>
+
+        <button 
+          class="btn-card btn-cancel"
+          *ngIf="vuelo.estado === 'Programado' || vuelo.estado === 'En Curso'"
+          (click)="cancelarVuelo(vuelo)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          Cancelar
+        </button>
+
+        <button 
+          class="btn-card btn-view"
+          *ngIf="vuelo.estado === 'Completado' || vuelo.estado === 'Cancelado'"
+          (click)="verDetalles(vuelo)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          Ver Detalles
+        </button>
+
+        <button 
+          class="btn-card btn-bitacora"
+          *ngIf="vuelo.estado === 'Completado'"
+          (click)="abrirBitacora(vuelo)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Bitácora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && vuelos.length === 0" class="empty-state">
+    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <h3>No tienes vuelos programados</h3>
+    <p>Los vuelos asignados a ti aparecerán aquí</p>
+  </div>
+</div>
+
+<!-- Modal de Completar Vuelo -->
+<div class="modal-overlay" *ngIf="showCompletarModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Completar Vuelo</h2>
+      <button class="btn-close" (click)="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="completarForm" (ngSubmit)="onCompletarSubmit()" class="modal-form">
+      <div class="form-group">
+        <label class="form-label">Hora de Finalización *</label>
+        <input
+          type="time"
+          formControlName="hora_fin"
+          class="form-input"
+          [class.input-error]="isFieldInvalid('hora_fin')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('hora_fin')">
+          La hora de finalización es requerida
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea
+          formControlName="observaciones"
+          class="form-input"
+          rows="4"
+          placeholder="Notas sobre el vuelo, desempeño del alumno, maniobras realizadas..."
+        ></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          <span *ngIf="!submitting">Completar Vuelo</span>
+          <span *ngIf="submitting" class="btn-loading">
+            <span class="spinner-small"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Bitácora -->
+<div class="modal-overlay modal-large" *ngIf="showBitacoraModal" (click)="closeBitacoraModal()">
+  <div class="modal-content modal-bitacora" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Bitácora de Vuelo</h2>
+        <p class="modal-subtitle" *ngIf="selectedVuelo">
+          {{ selectedVuelo.alumno?.nombre }} {{ selectedVuelo.alumno?.apellido }} - 
+          {{ formatDate(selectedVuelo.fecha) }}
+        </p>
+      </div>
+      <button class="btn-close" (click)="closeBitacoraModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="bitacoraForm" (ngSubmit)="onBitacoraSubmit()" class="modal-form modal-form-bitacora">
+      <!-- Sección de Calificaciones -->
+      <div class="bitacora-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Evaluación de Desempeño
+        </h3>
+        
+        <div class="calificaciones-grid">
+          <div class="calificacion-item">
+            <label class="calificacion-label">Calificación General</label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                *ngFor="let star of [1,2,3,4,5]" 
+                class="star-button"
+                [class.active]="star <= (bitacoraForm.get('calificacion_general')?.value || 0)"
+                (click)="setCalificacion('calificacion_general', star)">
+                ★
+              </button>
+            </div>
+          </div>
+
+          <div class="calificacion-item">
+            <label class="calificacion-label">Despegue</label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                *ngFor="let star of [1,2,3,4,5]" 
+                class="star-button"
+                [class.active]="star <= (bitacoraForm.get('calificacion_despegue')?.value || 0)"
+                (click)="setCalificacion('calificacion_despegue', star)">
+                ★
+              </button>
+            </div>
+          </div>
+
+          <div class="calificacion-item">
+            <label class="calificacion-label">Vuelo</label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                *ngFor="let star of [1,2,3,4,5]" 
+                class="star-button"
+                [class.active]="star <= (bitacoraForm.get('calificacion_vuelo')?.value || 0)"
+                (click)="setCalificacion('calificacion_vuelo', star)">
+                ★
+              </button>
+            </div>
+          </div>
+
+          <div class="calificacion-item">
+            <label class="calificacion-label">Aterrizaje</label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                *ngFor="let star of [1,2,3,4,5]" 
+                class="star-button"
+                [class.active]="star <= (bitacoraForm.get('calificacion_aterrizaje')?.value || 0)"
+                (click)="setCalificacion('calificacion_aterrizaje', star)">
+                ★
+              </button>
+            </div>
+          </div>
+
+          <div class="calificacion-item">
+            <label class="calificacion-label">Comunicación</label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                *ngFor="let star of [1,2,3,4,5]" 
+                class="star-button"
+                [class.active]="star <= (bitacoraForm.get('calificacion_comunicacion')?.value || 0)"
+                (click)="setCalificacion('calificacion_comunicacion', star)">
+                ★
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Maniobras -->
+      <div class="bitacora-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          Maniobras Realizadas
+        </h3>
+        
+        <div class="maniobras-grid">
+          <div *ngFor="let maniobra of maniobrasList" class="maniobra-checkbox">
+            <label class="checkbox-label-maniobra">
+              <input 
+                type="checkbox" 
+                [checked]="isManiobraSelected(maniobra.id)"
+                (change)="toggleManiobra(maniobra.id)"
+              />
+              <span class="maniobra-name">{{ maniobra.nombre }}</span>
+              <span class="maniobra-categoria" [ngClass]="'categoria-' + maniobra.categoria.toLowerCase()">
+                {{ maniobra.categoria }}
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Horas y Estadísticas -->
+      <div class="bitacora-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Registro de Horas y Estadísticas
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Horas de Vuelo Real</label>
+            <input
+              type="number"
+              step="0.1"
+              formControlName="horas_vuelo_real"
+              class="form-input"
+              placeholder="0.0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Horas en Simulador</label>
+            <input
+              type="number"
+              step="0.1"
+              formControlName="horas_vuelo_simulador"
+              class="form-input"
+              placeholder="0.0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Número de Despegues</label>
+            <input
+              type="number"
+              formControlName="numero_despegues"
+              class="form-input"
+              placeholder="0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Número de Aterrizajes</label>
+            <input
+              type="number"
+              formControlName="numero_aterrizajes"
+              class="form-input"
+              placeholder="0"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Condiciones -->
+      <div class="bitacora-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          </svg>
+          Condiciones del Vuelo
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Condiciones Climáticas</label>
+            <select formControlName="condiciones_climaticas" class="form-input">
+              <option value="">Seleccionar</option>
+              <option value="Despejado">Despejado</option>
+              <option value="Parcialmente Nublado">Parcialmente Nublado</option>
+              <option value="Nublado">Nublado</option>
+              <option value="Lluvia Ligera">Lluvia Ligera</option>
+              <option value="Tormenta">Tormenta</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Visibilidad</label>
+            <select formControlName="visibilidad" class="form-input">
+              <option value="">Seleccionar</option>
+              <option value="Excelente (>10km)">Excelente (>10km)</option>
+              <option value="Buena (5-10km)">Buena (5-10km)</option>
+              <option value="Moderada (2-5km)">Moderada (2-5km)</option>
+              <option value="Reducida (<2km)">Reducida (<2km)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Viento</label>
+            <input
+              type="text"
+              formControlName="viento"
+              class="form-input"
+              placeholder="Ej: 10 kt del norte"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Observaciones -->
+      <div class="bitacora-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Observaciones y Retroalimentación
+        </h3>
+        
+        <div class="form-group">
+          <label class="form-label">Observaciones Técnicas</label>
+          <textarea
+            formControlName="observaciones_tecnicas"
+            class="form-input"
+            rows="3"
+            placeholder="Aspectos técnicos del vuelo, procedimientos seguidos..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Observaciones Generales</label>
+          <textarea
+            formControlName="observaciones_generales"
+            class="form-input"
+            rows="3"
+            placeholder="Comentarios generales sobre el desempeño..."
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Áreas a Mejorar</label>
+            <textarea
+              formControlName="areas_mejorar"
+              class="form-input"
+              rows="3"
+              placeholder="Aspectos que el alumno debe trabajar..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Logros y Fortalezas</label>
+            <textarea
+              formControlName="logros"
+              class="form-input"
+              rows="3"
+              placeholder="Aspectos destacables del alumno..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección de Incidentes -->
+      <div class="bitacora-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          Registro de Incidentes
+        </h3>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="hubo_incidente" />
+            <span>¿Hubo algún incidente durante el vuelo?</span>
+          </label>
+        </div>
+
+        <div class="form-group" *ngIf="bitacoraForm.get('hubo_incidente')?.value">
+          <label class="form-label">Descripción del Incidente</label>
+          <textarea
+            formControlName="descripcion_incidente"
+            class="form-input"
+            rows="4"
+            placeholder="Describe detalladamente el incidente ocurrido..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeBitacoraModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="submittingBitacora">
+          <span *ngIf="!submittingBitacora">Guardar Bitácora</span>
+          <span *ngIf="submittingBitacora" class="btn-loading">
+            <span class="spinner-small"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

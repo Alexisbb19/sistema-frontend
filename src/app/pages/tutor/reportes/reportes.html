@@ -1,0 +1,236 @@
+<div class="reportes-container">
+  <!-- Header con acciones -->
+  <div class="reportes-header">
+    <div class="header-info">
+      <h2>Mis Estadísticas y Rendimiento</h2>
+      <p>Visualiza tu desempeño como tutor de vuelo</p>
+    </div>
+    <button class="btn-exportar" (click)="exportarReporte()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Exportar Reporte
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando reportes...</p>
+  </div>
+
+  <!-- Contenido -->
+  <div *ngIf="!loading" class="reportes-content">
+    <!-- Estadísticas Principales -->
+    <div class="stats-principales">
+      <div class="stat-card-reporte stat-total-vuelos">
+        <div class="stat-icon-reporte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="stat-content-reporte">
+          <h3 class="stat-numero">{{ totalVuelos }}</h3>
+          <p class="stat-label-reporte">Total de Vuelos</p>
+          <div class="stat-breakdown">
+            <span class="breakdown-item completados">
+              <span class="dot"></span>
+              {{ vuelosCompletados }} completados
+            </span>
+            <span class="breakdown-item programados">
+              <span class="dot"></span>
+              {{ vuelosProgramados }} programados
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card-reporte stat-horas">
+        <div class="stat-icon-reporte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="stat-content-reporte">
+          <h3 class="stat-numero">{{ horasTotales | number:'1.1-1' }}</h3>
+          <p class="stat-label-reporte">Horas de Vuelo</p>
+          <div class="stat-progress">
+            <div class="progress-bar-reporte">
+              <div class="progress-fill-reporte" 
+                   [style.width.%]="getProgressWidth(vuelosCompletados, totalVuelos)">
+              </div>
+            </div>
+            <span class="progress-text">{{ getProgressWidth(vuelosCompletados, totalVuelos) | number:'1.0-0' }}% completado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card-reporte stat-calificacion">
+        <div class="stat-icon-reporte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div class="stat-content-reporte">
+          <h3 class="stat-numero" [style.color]="getCalificacionColor(promedioCalificacion)">
+            {{ promedioCalificacion | number:'1.1-1' }}
+          </h3>
+          <p class="stat-label-reporte">Promedio de Calificación</p>
+          <div class="stars-container-reporte">
+            <span *ngFor="let star of getStars(promedioCalificacion)" 
+                  [ngClass]="'star-' + star">★</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vuelos por Mes -->
+    <div class="section-card-reporte">
+      <div class="section-header-reporte">
+        <h3 class="section-title-reporte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          Vuelos por Mes
+        </h3>
+      </div>
+
+      <div class="vuelos-mes-grid">
+        <div *ngFor="let mes of vuelosPorMes" class="mes-card">
+          <div class="mes-header">
+            <span class="mes-nombre">{{ mes.mes }} {{ mes.anio }}</span>
+            <span class="mes-cantidad">{{ mes.cantidad }}</span>
+          </div>
+          <div class="mes-bar">
+            <div class="mes-bar-fill" 
+                 [style.width.%]="(mes.cantidad / vuelosPorMes[0].cantidad) * 100">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="vuelosPorMes.length === 0" class="empty-chart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <p>No hay datos de vuelos por mes</p>
+      </div>
+    </div>
+
+    <!-- Mejores Alumnos -->
+    <div class="section-card-reporte">
+      <div class="section-header-reporte">
+        <h3 class="section-title-reporte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+          Alumnos con Mejor Rendimiento
+        </h3>
+      </div>
+
+      <div class="alumnos-ranking">
+        <div *ngFor="let alumno of mejoresAlumnos; let i = index" class="ranking-item">
+          <div class="ranking-position" [ngClass]="'position-' + (i + 1)">
+            {{ i + 1 }}
+          </div>
+          <div class="ranking-info">
+            <h4 class="ranking-nombre">{{ alumno.nombre }}</h4>
+            <div class="ranking-stats">
+              <span class="ranking-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                {{ alumno.calificacion | number:'1.1-1' }}
+              </span>
+              <span class="ranking-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ alumno.horas | number:'1.0-0' }}h
+              </span>
+              <span class="ranking-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ alumno.vuelos }}
+              </span>
+            </div>
+          </div>
+          <div class="ranking-calificacion" [style.background-color]="getCalificacionColor(alumno.calificacion)">
+            {{ alumno.calificacion | number:'1.1-1' }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mejoresAlumnos.length === 0" class="empty-chart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <p>No hay alumnos con calificaciones registradas</p>
+      </div>
+    </div>
+
+    <!-- Resumen Mensual -->
+    <div class="section-card-reporte resumen-mensual">
+      <h3 class="section-title-reporte">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Resumen del Mes Actual
+      </h3>
+
+      <div class="resumen-grid">
+        <div class="resumen-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <div class="resumen-content">
+            <span class="resumen-label">Vuelos este mes</span>
+            <span class="resumen-value">{{ vuelosPorMes.length > 0 ? vuelosPorMes[0].cantidad : 0 }}</span>
+          </div>
+        </div>
+
+        <div class="resumen-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <div class="resumen-content">
+            <span class="resumen-label">Alumnos activos</span>
+            <span class="resumen-value">{{ mejoresAlumnos.length }}</span>
+          </div>
+        </div>
+
+        <div class="resumen-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <div class="resumen-content">
+            <span class="resumen-label">Tasa de éxito</span>
+            <span class="resumen-value">{{ getProgressWidth(vuelosCompletados, totalVuelos) | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

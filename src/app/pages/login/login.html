@@ -1,0 +1,139 @@
+<div class="login-container">
+  <!-- Fondo animado con aviones -->
+  <div class="background-animation">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="plane-container">
+      <svg class="plane" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 20 L40 35 L20 35 L25 45 L15 45 L20 50 L15 55 L25 55 L20 65 L40 65 L50 80 L60 65 L80 65 L75 55 L85 55 L80 50 L85 45 L75 45 L80 35 L60 35 Z" fill="white" opacity="0.8"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Contenedor del formulario -->
+  <div class="login-card">
+    <!-- Logo y título -->
+    <div class="login-header">
+      <div class="logo-container">
+        <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="#2563eb" opacity="0.1"/>
+          <path d="M50 20 L40 35 L20 35 L25 45 L15 45 L20 50 L15 55 L25 55 L20 65 L40 65 L50 80 L60 65 L80 65 L75 55 L85 55 L80 50 L85 45 L75 45 L80 35 L60 35 Z" fill="#2563eb"/>
+        </svg>
+      </div>
+      <h1 class="title">Escuela de Aviación</h1>
+      <p class="subtitle">Sistema de Gestión Aeronáutica</p>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Campo de correo -->
+      <div class="form-group">
+        <label for="correo" class="form-label">
+          <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Correo Electrónico
+        </label>
+        <input
+          type="email"
+          id="correo"
+          formControlName="correo"
+          class="form-input"
+          placeholder="usuario@aviacion.com"
+          [class.input-error]="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched"
+        />
+        <div class="error-message" *ngIf="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched">
+          <span *ngIf="loginForm.get('correo')?.errors?.['required']">El correo es requerido</span>
+          <span *ngIf="loginForm.get('correo')?.errors?.['email']">Ingrese un correo válido</span>
+        </div>
+      </div>
+
+      <!-- Campo de contraseña -->
+      <div class="form-group">
+        <label for="password" class="form-label">
+          <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Contraseña
+        </label>
+        <div class="password-input-container">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-input"
+            placeholder="••••••••"
+            [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePassword()"
+            tabindex="-1"
+          >
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">La contraseña es requerida</span>
+        </div>
+      </div>
+
+      <!-- Mensaje de error del servidor -->
+      <div class="server-error" *ngIf="errorMessage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botón de inicio de sesión -->
+      <button
+        type="submit"
+        class="submit-button"
+        [disabled]="loginForm.invalid || loading"
+      >
+        <span *ngIf="!loading" class="button-content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Iniciar Sesión
+        </span>
+        <span *ngIf="loading" class="loading-spinner"></span>
+      </button>
+    </form>
+
+    <!-- Información de prueba -->
+    <div class="test-credentials">
+      <p class="test-title">Credenciales de prueba:</p>
+      <div class="test-list">
+        <div class="test-item">
+          <span class="test-role">Admin:</span>
+          <span class="test-email">admin@aviacion.com / admin123</span>
+        </div>
+        <div class="test-item">
+          <span class="test-role">Tutor:</span>
+          <span class="test-email">tutor@aviacion.com / tutor123</span>
+        </div>
+        <div class="test-item">
+          <span class="test-role">Alumno:</span>
+          <span class="test-email">alumno@aviacion.com / alumno123</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

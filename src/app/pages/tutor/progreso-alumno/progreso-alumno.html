@@ -1,0 +1,441 @@
+<div class="progreso-alumno-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando progreso del alumno...</p>
+  </div>
+
+  <!-- Contenido -->
+  <div *ngIf="!loading && progreso" class="content">
+    <!-- Header con info del alumno -->
+    <div class="alumno-header">
+      <button class="btn-back" (click)="volver()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Volver
+      </button>
+
+      <div class="alumno-header-content">
+        <div class="alumno-avatar-large">
+          {{ getInitials(progreso.alumno.nombre, progreso.alumno.apellido) }}
+        </div>
+        <div class="alumno-header-info">
+          <h1 class="alumno-nombre-grande">{{ progreso.alumno.nombre }} {{ progreso.alumno.apellido }}</h1>
+          <p class="alumno-correo-grande">{{ progreso.alumno.correo }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de estadísticas principales -->
+    <div class="stats-overview">
+      <div class="stat-card-overview">
+        <div class="stat-icon-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-value-large">{{ progreso.estadisticas.vuelos_completados }}</span>
+          <span class="stat-label-overview">Vuelos Completados</span>
+        </div>
+      </div>
+
+      <div class="stat-card-overview">
+        <div class="stat-icon-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-value-large">{{ progreso.estadisticas.horas_totales | number:'1.1-1' }}</span>
+          <span class="stat-label-overview">Horas de Vuelo</span>
+        </div>
+      </div>
+
+      <div class="stat-card-overview">
+        <div class="stat-icon-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-value-large">{{ progreso.estadisticas.promedio_calificacion_general | number:'1.1-1' }}</span>
+          <span class="stat-label-overview">Promedio General</span>
+        </div>
+      </div>
+
+      <div class="stat-card-overview">
+        <div class="stat-icon-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-value-large">{{ getProgressPercentage(progreso.estadisticas.vuelos_completados, progreso.estadisticas.total_vuelos) }}%</span>
+          <span class="stat-label-overview">Tasa de Finalización</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <button 
+        class="tab-button" 
+        [class.active]="selectedTab === 'estadisticas'"
+        (click)="selectTab('estadisticas')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Estadísticas Detalladas
+      </button>
+
+      <button 
+        class="tab-button" 
+        [class.active]="selectedTab === 'progresion'"
+        (click)="selectTab('progresion')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Progresión
+      </button>
+
+      <button 
+        class="tab-button" 
+        [class.active]="selectedTab === 'bitacoras'"
+        (click)="selectTab('bitacoras')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Bitácoras Recientes
+      </button>
+
+      <button 
+        class="tab-button" 
+        [class.active]="selectedTab === 'proximos'"
+        (click)="selectTab('proximos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Próximos Vuelos
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Estadísticas Detalladas -->
+      <div *ngIf="selectedTab === 'estadisticas'" class="estadisticas-tab">
+        <!-- Calificaciones por Categoría -->
+        <div class="section-card">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            Calificaciones por Categoría
+          </h3>
+
+          <div class="calificaciones-detail-grid">
+            <div class="calificacion-item-detail">
+              <div class="calificacion-header-detail">
+                <span class="calificacion-name">Despegue</span>
+                <span class="calificacion-value">{{ progreso.estadisticas.promedio_despegue | number:'1.1-1' }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" 
+                     [style.width.%]="(progreso.estadisticas.promedio_despegue / 5) * 100"
+                     [style.background-color]="getCalificacionColor(progreso.estadisticas.promedio_despegue)">
+                </div>
+              </div>
+              <div class="stars-container-small">
+                <span *ngFor="let star of getStars(progreso.estadisticas.promedio_despegue)" 
+                      [ngClass]="'star-' + star">★</span>
+              </div>
+            </div>
+
+            <div class="calificacion-item-detail">
+              <div class="calificacion-header-detail">
+                <span class="calificacion-name">Vuelo</span>
+                <span class="calificacion-value">{{ progreso.estadisticas.promedio_vuelo | number:'1.1-1' }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" 
+                     [style.width.%]="(progreso.estadisticas.promedio_vuelo / 5) * 100"
+                     [style.background-color]="getCalificacionColor(progreso.estadisticas.promedio_vuelo)">
+                </div>
+              </div>
+              <div class="stars-container-small">
+                <span *ngFor="let star of getStars(progreso.estadisticas.promedio_vuelo)" 
+                      [ngClass]="'star-' + star">★</span>
+              </div>
+            </div>
+
+            <div class="calificacion-item-detail">
+              <div class="calificacion-header-detail">
+                <span class="calificacion-name">Aterrizaje</span>
+                <span class="calificacion-value">{{ progreso.estadisticas.promedio_aterrizaje | number:'1.1-1' }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" 
+                     [style.width.%]="(progreso.estadisticas.promedio_aterrizaje / 5) * 100"
+                     [style.background-color]="getCalificacionColor(progreso.estadisticas.promedio_aterrizaje)">
+                </div>
+              </div>
+              <div class="stars-container-small">
+                <span *ngFor="let star of getStars(progreso.estadisticas.promedio_aterrizaje)" 
+                      [ngClass]="'star-' + star">★</span>
+              </div>
+            </div>
+
+            <div class="calificacion-item-detail">
+              <div class="calificacion-header-detail">
+                <span class="calificacion-name">Comunicación</span>
+                <span class="calificacion-value">{{ progreso.estadisticas.promedio_comunicacion | number:'1.1-1' }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" 
+                     [style.width.%]="(progreso.estadisticas.promedio_comunicacion / 5) * 100"
+                     [style.background-color]="getCalificacionColor(progreso.estadisticas.promedio_comunicacion)">
+                </div>
+              </div>
+              <div class="stars-container-small">
+                <span *ngFor="let star of getStars(progreso.estadisticas.promedio_comunicacion)" 
+                      [ngClass]="'star-' + star">★</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas de Operaciones -->
+        <div class="section-card">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            Estadísticas de Operaciones
+          </h3>
+
+          <div class="operations-grid">
+            <div class="operation-stat">
+              <div class="operation-icon despegue-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M17 8l4 4-4 4M3 12h18"/>
+                </svg>
+              </div>
+              <div class="operation-data">
+                <span class="operation-value">{{ progreso.estadisticas.total_despegues }}</span>
+                <span class="operation-label">Despegues</span>
+              </div>
+            </div>
+
+            <div class="operation-stat">
+              <div class="operation-icon aterrizaje-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M7 8l-4 4 4 4M21 12H3"/>
+                </svg>
+              </div>
+              <div class="operation-data">
+                <span class="operation-value">{{ progreso.estadisticas.total_aterrizajes }}</span>
+                <span class="operation-label">Aterrizajes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Maniobras Dominadas -->
+        <div class="section-card">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Maniobras Dominadas ({{ progreso.maniobras_dominadas.length }})
+          </h3>
+
+          <div *ngIf="progreso.maniobras_dominadas.length > 0" class="maniobras-section">
+            <div *ngFor="let grupo of getManiobrasAgrupadas() | keyvalue" class="maniobra-grupo">
+              <h4 class="maniobra-grupo-titulo" 
+                  [ngClass]="'grupo-' + grupo.key.toLowerCase()"
+                  *ngIf="grupo.value.length > 0">
+                {{ grupo.key }}
+              </h4>
+              <div class="maniobras-list">
+                <span *ngFor="let maniobra of grupo.value" 
+                      class="maniobra-badge"
+                      [ngClass]="'badge-' + grupo.key.toLowerCase()">
+                  {{ maniobra }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="progreso.maniobras_dominadas.length === 0" class="empty-maniobras">
+            <p>El alumno aún no ha dominado ninguna maniobra</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progresión -->
+      <div *ngIf="selectedTab === 'progresion'" class="progresion-tab">
+        <div class="section-card">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Evolución de Calificaciones
+          </h3>
+
+          <div *ngIf="progreso.progresion_calificaciones.length > 0" class="timeline-container">
+            <div *ngFor="let punto of progreso.progresion_calificaciones; let i = index" class="timeline-item">
+              <div class="timeline-marker" [style.background-color]="getCalificacionColor(punto.calificacion_general)"></div>
+              <div class="timeline-content">
+                <div class="timeline-date">{{ formatShortDate(punto.fecha) }}</div>
+                <div class="timeline-calificaciones">
+                  <div class="cal-mini" *ngIf="punto.calificacion_despegue">
+                    <span class="cal-label">Despegue:</span>
+                    <span class="cal-value">{{ punto.calificacion_despegue }}</span>
+                  </div>
+                  <div class="cal-mini" *ngIf="punto.calificacion_vuelo">
+                    <span class="cal-label">Vuelo:</span>
+                    <span class="cal-value">{{ punto.calificacion_vuelo }}</span>
+                  </div>
+                  <div class="cal-mini" *ngIf="punto.calificacion_aterrizaje">
+                    <span class="cal-label">Aterrizaje:</span>
+                    <span class="cal-value">{{ punto.calificacion_aterrizaje }}</span>
+                  </div>
+                  <div class="cal-mini" *ngIf="punto.calificacion_comunicacion">
+                    <span class="cal-label">Comunicación:</span>
+                    <span class="cal-value">{{ punto.calificacion_comunicacion }}</span>
+                  </div>
+                </div>
+                <div class="timeline-general">
+                  <strong>General: {{ punto.calificacion_general }}</strong>
+                  <div class="stars-container-tiny">
+                    <span *ngFor="let star of getStars(punto.calificacion_general)" 
+                          [ngClass]="'star-' + star">★</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="progreso.progresion_calificaciones.length === 0" class="empty-state-tab">
+            <p>No hay datos de progresión disponibles</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bitácoras Recientes -->
+      <div *ngIf="selectedTab === 'bitacoras'" class="bitacoras-tab">
+        <div *ngFor="let bitacora of progreso.ultimas_bitacoras" class="bitacora-card">
+          <div class="bitacora-header">
+            <div class="bitacora-fecha">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              {{ formatDate(bitacora.vuelo.fecha) }}
+            </div>
+            <div class="bitacora-avioneta" *ngIf="bitacora.vuelo.avioneta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+              </svg>
+              {{ bitacora.vuelo.avioneta.codigo }}
+            </div>
+          </div>
+
+          <div class="bitacora-calificaciones">
+            <div class="cal-badge" *ngIf="bitacora.calificacion_general">
+              <span class="cal-name">General</span>
+              <span class="cal-num" [style.background-color]="getCalificacionColor(bitacora.calificacion_general)">
+                {{ bitacora.calificacion_general }}
+              </span>
+            </div>
+            <div class="cal-badge" *ngIf="bitacora.calificacion_despegue">
+              <span class="cal-name">Despegue</span>
+              <span class="cal-num">{{ bitacora.calificacion_despegue }}</span>
+            </div>
+            <div class="cal-badge" *ngIf="bitacora.calificacion_vuelo">
+              <span class="cal-name">Vuelo</span>
+              <span class="cal-num">{{ bitacora.calificacion_vuelo }}</span>
+            </div>
+            <div class="cal-badge" *ngIf="bitacora.calificacion_aterrizaje">
+              <span class="cal-name">Aterrizaje</span>
+              <span class="cal-num">{{ bitacora.calificacion_aterrizaje }}</span>
+            </div>
+          </div>
+
+          <div class="bitacora-observaciones" *ngIf="bitacora.observaciones_generales">
+            <h4>Observaciones:</h4>
+            <p>{{ bitacora.observaciones_generales }}</p>
+          </div>
+
+          <div class="bitacora-areas" *ngIf="bitacora.areas_mejorar">
+            <h4>Áreas a Mejorar:</h4>
+            <p>{{ bitacora.areas_mejorar }}</p>
+          </div>
+
+          <div class="bitacora-logros" *ngIf="bitacora.logros">
+            <h4>Logros:</h4>
+            <p>{{ bitacora.logros }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="progreso.ultimas_bitacoras.length === 0" class="empty-state-tab">
+          <p>No hay bitácoras registradas</p>
+        </div>
+      </div>
+
+      <!-- Próximos Vuelos -->
+      <div *ngIf="selectedTab === 'proximos'" class="proximos-tab">
+        <div *ngFor="let vuelo of progreso.proximos_vuelos" class="vuelo-proximo-card">
+          <div class="vuelo-fecha-hora">
+            <div class="fecha-grande">{{ formatDate(vuelo.fecha) }}</div>
+            <div class="hora-grande">{{ vuelo.hora_inicio }} - {{ vuelo.hora_fin || 'N/A' }}</div>
+          </div>
+
+          <div class="vuelo-info-grid">
+            <div class="info-item-proximo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+              </svg>
+              <span>{{ vuelo.avioneta?.codigo || 'N/A' }}</span>
+            </div>
+            <div class="info-item-proximo">
+              <span class="estado-badge-proximo" [ngClass]="'estado-' + vuelo.estado.toLowerCase().replace(' ', '-')">
+                {{ vuelo.estado }}
+              </span>
+            </div>
+          </div>
+
+          <div class="vuelo-observaciones-proximo" *ngIf="vuelo.observaciones">
+            <p>{{ vuelo.observaciones }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="progreso.proximos_vuelos.length === 0" class="empty-state-tab">
+          <svg class="empty-icon-tab" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <p>No hay vuelos programados próximamente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

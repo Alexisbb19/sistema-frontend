@@ -1,0 +1,435 @@
+/* Dashboard Content - Diseño Moderno */
+.stats-grid {
+  padding: 32px 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading State */
+.loading-dashboard {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.loading-dashboard p {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 20px;
+}
+
+.spinner-large {
+  width: 70px;
+  height: 70px;
+  border: 6px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-right-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modern Stat Cards */
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: row;    /* ← de vertical a horizontal */
+  align-items: center;    /* centra el icono */
+  gap: 20px;              /* separación icono ↔ texto */
+  height: 120px;          /* ← tarjeta más alargada */
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  transition: .3s ease;
+}
+
+
+/* Efecto de brillo animado */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+/* Barra superior de color */
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, currentColor, currentColor 50%, transparent);
+  border-radius: 24px 24px 0 0;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Color Themes */
+.stat-card.stat-blue { 
+  color: #3b82f6;
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+}
+
+.stat-card.stat-green { 
+  color: #10b981;
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+}
+
+.stat-card.stat-purple { 
+  color: #8b5cf6;
+  background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%);
+}
+
+.stat-card.stat-orange { 
+  color: #f59e0b;
+  background: linear-gradient(135deg, #fed7aa 0%, #fef3c7 100%);
+}
+
+.stat-card.stat-teal { 
+  color: #14b8a6;
+  background: linear-gradient(135deg, #ccfbf1 0%, #f0fdfa 100%);
+}
+
+.stat-card.stat-cyan { 
+  color: #06b6d4;
+  background: linear-gradient(135deg, #cffafe 0%, #ecfeff 100%);
+}
+
+/* Icon Container */
+.stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.4); /* más contraste */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.stat-card:hover .stat-icon {
+  transform: rotate(5deg) scale(1.1);
+  opacity: 0.2;
+}
+
+.stat-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  opacity: 0.9; /* más visible */
+  position: relative;
+  z-index: 1;
+}
+/* Content Section */
+.stat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, currentColor, #64748b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  color: #475569;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-trend {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  transition: all 0.3s;
+}
+
+.stat-trend::before {
+  content: '●';
+  font-size: 18px;
+}
+
+.stat-trend.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.stat-trend.positive::before {
+  content: '↑';
+}
+
+.stat-trend.neutral {
+  background: rgba(148, 163, 184, 0.15);
+  color: #475569;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.stat-trend.neutral::before {
+  content: '→';
+}
+
+.stat-trend.negative {
+  background: rgba(239, 68, 68, 0.15);
+  color: #991b1b;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.stat-trend.negative::before {
+  content: '↓';
+}
+
+/* Welcome Section */
+.welcome-section {
+  padding: 0 40px 32px;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 32px;
+  padding: 48px;
+  color: white;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efectos decorativos de fondo */
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.welcome-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.welcome-icon {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.welcome-icon svg {
+  width: 140px;
+  height: 140px;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-content h2 {
+  font-size: 32px;
+  margin: 0 0 16px 0;
+  font-weight: 800;
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-content p {
+  font-size: 17px;
+  opacity: 0.95;
+  margin: 0 0 28px 0;
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+.welcome-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+}
+
+.feature-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+}
+
+.feature-item svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 3;
+  flex-shrink: 0;
+}
+
+/* Footer */
+.dashboard-footer {
+  padding: 32px 40px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  border-top: 2px solid #e2e8f0;
+  margin-top: 48px;
+  background: linear-gradient(to bottom, transparent, #f8fafc);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .welcome-section {
+    padding: 0 20px 24px;
+  }
+
+  .welcome-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 28px;
+    gap: 32px;
+  }
+
+  .welcome-content h2 {
+    font-size: 28px;
+  }
+
+  .welcome-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    padding: 20px 16px;
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 24px;
+  }
+
+  .stat-value {
+    font-size: 32px;
+  }
+
+  .welcome-card {
+    padding: 32px 20px;
+  }
+
+  .welcome-icon svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .welcome-content h2 {
+    font-size: 24px;
+  }
+
+  .welcome-content p {
+    font-size: 15px;
+  }
+
+  .dashboard-footer {
+    padding: 24px 16px;
+  }
+}

@@ -1,0 +1,508 @@
+/* mis-alumnos.css */
+.mis-alumnos-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total { border-left: 4px solid #3b82f6; }
+.stat-activos { border-left: 4px solid #10b981; }
+.stat-promedio { border-left: 4px solid #f59e0b; }
+.stat-horas { border-left: 4px solid #8b5cf6; }
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-total .stat-icon { background: #dbeafe; }
+.stat-activos .stat-icon { background: #d1fae5; }
+.stat-promedio .stat-icon { background: #fef3c7; }
+.stat-horas .stat-icon { background: #ede9fe; }
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+.stat-total .stat-icon svg { stroke: #3b82f6; }
+.stat-activos .stat-icon svg { stroke: #10b981; }
+.stat-promedio .stat-icon svg { stroke: #f59e0b; }
+.stat-horas .stat-icon svg { stroke: #8b5cf6; }
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Search Section */
+.search-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 0.5rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-search:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.btn-clear-search svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f4f6;
+  border-top-color: #ec4899;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Alumnos Grid */
+.alumnos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.alumno-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.alumno-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Header */
+.card-header {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.alumno-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.alumno-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.alumno-nombre {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.alumno-correo {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alumno-telefono {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.alumno-telefono svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Card Stats */
+.card-stats {
+  padding: 1rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  background: #f9fafb;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.stat-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Calificación */
+.calificacion-section {
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.calificacion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.calificacion-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.calificacion-numero {
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.calificacion-excelente {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.calificacion-buena {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.calificacion-regular {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.calificacion-baja {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.stars-container {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1.25rem;
+}
+
+.star-full {
+  color: #fbbf24;
+}
+
+.star-half {
+  color: #fbbf24;
+  opacity: 0.5;
+}
+
+.star-empty {
+  color: #d1d5db;
+}
+
+/* Próximo/Último Vuelo */
+.proximo-vuelo,
+.ultimo-vuelo {
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.proximo-vuelo-header,
+.ultimo-vuelo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.proximo-vuelo-header svg,
+.ultimo-vuelo-header svg {
+  width: 16px;
+  height: 16px;
+}
+
+.proximo-vuelo-info,
+.ultimo-vuelo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fecha {
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-weight: 600;
+  margin: 0;
+}
+
+.hora,
+.avioneta {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+  width: fit-content;
+}
+
+.estado-programado {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-en-curso {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-completado {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.estado-cancelado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 1rem 1.5rem;
+}
+
+.btn-ver-progreso {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #ec4899;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-ver-progreso:hover {
+  background: #db2777;
+}
+
+.btn-ver-progreso svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  stroke: #d1d5db;
+  stroke-width: 1.5;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mis-alumnos-container {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alumnos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .alumno-correo {
+    white-space: normal;
+  }
+}

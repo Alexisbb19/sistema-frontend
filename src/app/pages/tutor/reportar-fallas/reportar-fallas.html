@@ -1,0 +1,337 @@
+<div class="reportar-fallas-container">
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'nuevo'"
+      (click)="selectTab('nuevo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nuevo Reporte
+    </button>
+
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'historial'"
+      (click)="selectTab('historial')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Mis Reportes ({{ reportes.length }})
+    </button>
+  </div>
+
+  <!-- Tab: Nuevo Reporte -->
+  <div *ngIf="activeTab === 'nuevo'" class="nuevo-reporte-tab">
+    <div class="form-card">
+      <div class="form-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div>
+          <h2>Reportar Falla Técnica</h2>
+          <p>Informa sobre cualquier problema técnico en las avionetas</p>
+        </div>
+      </div>
+
+      <form [formGroup]="reporteForm" (ngSubmit)="onSubmit()" class="reporte-form">
+        <!-- Selección de Avioneta -->
+        <div class="form-group">
+          <label class="form-label">
+            Avioneta *
+            <span class="label-hint">Selecciona la avioneta con problemas</span>
+          </label>
+          <select 
+            formControlName="avioneta_id" 
+            class="form-input"
+            [class.input-error]="isFieldInvalid('avioneta_id')">
+            <option value="">Seleccionar avioneta...</option>
+            <option *ngFor="let avioneta of avionetas" [value]="avioneta.id_avioneta">
+              {{ avioneta.codigo }} - {{ avioneta.modelo }}
+            </option>
+          </select>
+          <span class="error-text" *ngIf="isFieldInvalid('avioneta_id')">
+            Debes seleccionar una avioneta
+          </span>
+        </div>
+
+        <!-- Tipo de Falla y Severidad -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              Tipo de Falla *
+              <span class="label-hint">Categoría del problema</span>
+            </label>
+            <select 
+              formControlName="tipo_falla" 
+              class="form-input"
+              [class.input-error]="isFieldInvalid('tipo_falla')">
+              <option value="">Seleccionar tipo...</option>
+              <option *ngFor="let tipo of tiposFalla" [value]="tipo">
+                {{ tipo }}
+              </option>
+            </select>
+            <span class="error-text" *ngIf="isFieldInvalid('tipo_falla')">
+              Debes seleccionar un tipo de falla
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Severidad *
+              <span class="label-hint">Nivel de urgencia</span>
+            </label>
+            <div class="severidad-options">
+              <label 
+                *ngFor="let sev of severidades" 
+                class="severidad-option"
+                [class.selected]="reporteForm.get('severidad')?.value === sev.value">
+                <input 
+                  type="radio" 
+                  formControlName="severidad" 
+                  [value]="sev.value">
+                <span class="severidad-indicator" [style.background-color]="sev.color"></span>
+                <span class="severidad-label">{{ sev.label }}</span>
+              </label>
+            </div>
+            <span class="error-text" *ngIf="isFieldInvalid('severidad')">
+              Debes seleccionar la severidad
+            </span>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label class="form-label">
+            Descripción Detallada *
+            <span class="label-hint">Explica el problema (mínimo 10 caracteres)</span>
+          </label>
+          <textarea
+            formControlName="descripcion"
+            class="form-input form-textarea"
+            rows="6"
+            placeholder="Describe detalladamente el problema encontrado, síntomas, condiciones en las que ocurrió..."
+            [class.input-error]="isFieldInvalid('descripcion')">
+          </textarea>
+          <div class="input-footer">
+            <span class="error-text" *ngIf="isFieldInvalid('descripcion')">
+              La descripción debe tener al menos 10 caracteres
+            </span>
+            <span class="char-count">
+              {{ reporteForm.get('descripcion')?.value?.length || 0 }} caracteres
+            </span>
+          </div>
+        </div>
+
+        <!-- Atención Inmediata -->
+        <div class="form-group">
+          <label class="checkbox-label-especial">
+            <input type="checkbox" formControlName="requiere_atencion_inmediata">
+            <div class="checkbox-content">
+              <span class="checkbox-title">Requiere Atención Inmediata</span>
+              <span class="checkbox-description">
+                Marca esta opción si el problema representa un riesgo de seguridad
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn-secondary-form"
+            (click)="reporteForm.reset(); reporteForm.patchValue({requiere_atencion_inmediata: false})">
+            Limpiar Formulario
+          </button>
+          <button 
+            type="submit" 
+            class="btn-primary-form"
+            [disabled]="submitting">
+            <span *ngIf="!submitting">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              Reportar Falla
+            </span>
+            <span *ngIf="submitting" class="btn-loading">
+              <span class="spinner-small"></span>
+              Enviando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tab: Historial -->
+  <div *ngIf="activeTab === 'historial'" class="historial-tab">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando reportes...</p>
+    </div>
+
+    <!-- Lista de Reportes -->
+    <div *ngIf="!loading" class="reportes-list">
+      <div *ngFor="let reporte of reportes" class="reporte-card">
+        <div class="reporte-header">
+          <div class="reporte-avioneta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+            </svg>
+            <div class="avioneta-info">
+              <span class="avioneta-codigo">{{ reporte.avioneta?.codigo }}</span>
+              <span class="avioneta-modelo">{{ reporte.avioneta?.modelo }}</span>
+            </div>
+          </div>
+          <span class="estado-badge" [ngClass]="getEstadoClass(reporte.estado || 'Reportado')">
+            {{ reporte.estado || 'Reportado' }}
+          </span>
+        </div>
+
+        <div class="reporte-body">
+          <div class="reporte-info-grid">
+            <div class="info-item-reporte">
+              <span class="info-label">Tipo:</span>
+              <span class="info-value">{{ reporte.tipo_falla }}</span>
+            </div>
+            <div class="info-item-reporte">
+              <span class="info-label">Severidad:</span>
+              <span class="severidad-badge" [style.background-color]="getSeveridadColor(reporte.severidad)">
+                {{ reporte.severidad }}
+              </span>
+            </div>
+            <div class="info-item-reporte">
+              <span class="info-label">Fecha:</span>
+              <span class="info-value">{{ formatDate(reporte.created_at || '') }}</span>
+            </div>
+          </div>
+
+          <div class="reporte-descripcion">
+            <p>{{ reporte.descripcion }}</p>
+          </div>
+
+          <div class="reporte-urgente" *ngIf="reporte.requiere_atencion_inmediata">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Requiere atención inmediata
+          </div>
+        </div>
+
+        <div class="reporte-footer">
+          <button class="btn-ver-detalle" (click)="verDetalleReporte(reporte)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            Ver Detalles
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && reportes.length === 0" class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <h3>No has reportado fallas</h3>
+      <p>Los reportes de fallas que realices aparecerán aquí</p>
+      <button class="btn-secondary" (click)="selectTab('nuevo')">
+        Crear Primer Reporte
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalle -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalle del Reporte</h2>
+      <button class="btn-close" (click)="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedReporte">
+      <div class="detalle-section">
+        <h4>Avioneta</h4>
+        <p class="detalle-avioneta">
+          {{ selectedReporte.avioneta?.codigo }} - {{ selectedReporte.avioneta?.modelo }}
+        </p>
+      </div>
+
+      <div class="detalle-grid">
+        <div class="detalle-item">
+          <span class="detalle-label">Tipo de Falla:</span>
+          <span class="detalle-value">{{ selectedReporte.tipo_falla }}</span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Severidad:</span>
+          <span class="severidad-badge-large" [style.background-color]="getSeveridadColor(selectedReporte.severidad)">
+            {{ selectedReporte.severidad }}
+          </span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Estado:</span>
+          <span class="estado-badge-large" [ngClass]="getEstadoClass(selectedReporte.estado || 'Reportado')">
+            {{ selectedReporte.estado || 'Reportado' }}
+          </span>
+        </div>
+        <div class="detalle-item">
+          <span class="detalle-label">Fecha de Reporte:</span>
+          <span class="detalle-value">{{ formatDate(selectedReporte.created_at || '') }}</span>
+        </div>
+      </div>
+
+      <div class="detalle-section" *ngIf="selectedReporte.requiere_atencion_inmediata">
+        <div class="alerta-urgente">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <div>
+            <strong>Requiere Atención Inmediata</strong>
+            <p>Este reporte ha sido marcado como crítico</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="detalle-section">
+        <h4>Descripción</h4>
+        <p class="detalle-descripcion">{{ selectedReporte.descripcion }}</p>
+      </div>
+
+      <div class="detalle-section" *ngIf="selectedReporte.notas_resolucion">
+        <h4>Notas de Resolución</h4>
+        <p class="detalle-resolucion">{{ selectedReporte.notas_resolucion }}</p>
+      </div>
+
+      <div class="detalle-section" *ngIf="selectedReporte.fecha_resolucion">
+        <h4>Fecha de Resolución</h4>
+        <p class="detalle-value">{{ formatDate(selectedReporte.fecha_resolucion) }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModal()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

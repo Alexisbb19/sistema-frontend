@@ -1,0 +1,140 @@
+<!-- Stats Cards -->
+<div class="stats-grid" *ngIf="!loading && dashboardData">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-value">{{ dashboardData.usuarios.total }}</h3>
+      <p class="stat-label">Total Usuarios</p>
+      <span class="stat-trend positive">{{ dashboardData.usuarios.activos }} activos</span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-green">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-value">{{ dashboardData.usuarios.alumnos }}</h3>
+      <p class="stat-label">Alumnos Activos</p>
+      <span class="stat-trend positive">{{ dashboardData.usuarios.tutores }} tutores</span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-purple">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+        <path d="M12 8v8M8 12h8"/>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-value">{{ dashboardData.avionetas.total }}</h3>
+      <p class="stat-label">Avionetas</p>
+      <span class="stat-trend" [ngClass]="dashboardData.avionetas.activas >= dashboardData.avionetas.total * 0.7 ? 'positive' : 'negative'">
+        {{ dashboardData.avionetas.activas }} disponibles
+      </span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-orange">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-value">{{ dashboardData.vuelos.total }}</h3>
+      <p class="stat-label">Vuelos Totales</p>
+      <span class="stat-trend positive">{{ dashboardData.vuelos.hoy }} hoy</span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-teal">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-value">{{ dashboardData.vuelos.horas_voladas || 0 }}</h3>
+      <p class="stat-label">Horas Voladas</p>
+      <span class="stat-trend positive">{{ dashboardData.vuelos.completados }} completados</span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-cyan">
+    <div class="stat-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-value">{{ dashboardData.vuelos.programados }}</h3>
+      <p class="stat-label">Vuelos Programados</p>
+      <span class="stat-trend neutral">{{ dashboardData.vuelos.esta_semana }} esta semana</span>
+    </div>
+  </div>
+</div>
+
+    
+
+    <!-- Welcome Message -->
+    <div class="welcome-section">
+      <div class="welcome-card">
+        <div class="welcome-icon">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 20 L40 35 L20 35 L25 45 L15 45 L20 50 L15 55 L25 55 L20 65 L40 65 L50 80 L60 65 L80 65 L75 55 L85 55 L80 50 L85 45 L75 45 L80 35 L60 35 Z" fill="url(#gradient)"/>
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="welcome-content">
+          <h2>¡Bienvenido al Sistema de Gestión Aeronáutica!</h2>
+          <p>Esta es tu área de administración. Desde aquí podrás gestionar todos los aspectos de la escuela de aviación.</p>
+          <div class="welcome-features">
+            <div class="feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Gestión de usuarios y roles</span>
+            </div>
+            <div class="feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Control de acceso por permisos</span>
+            </div>
+            <div class="feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Reportes y estadísticas en tiempo real</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+      <p>&copy; 2024 Escuela de Aviación. Sistema en desarrollo.</p>
+    </footer>

@@ -1,0 +1,295 @@
+<div class="reportes-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        Reportes y Análisis
+      </h1>
+      <p class="page-description">Visualiza estadísticas detalladas y métricas de rendimiento</p>
+    </div>
+  </div>
+
+  <!-- Tabs de navegación -->
+  <div class="tabs-container">
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'general'"
+      (click)="activeTab = 'general'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      General
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'tutores'"
+      (click)="selectTab('tutores')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Tutores
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'alumnos'"
+      (click)="selectTab('alumnos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+      Alumnos
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'avionetas'"
+      (click)="selectTab('avionetas')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+        <path d="M12 8v8M8 12h8"/>
+      </svg>
+      Avionetas
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'heatmap'"
+      (click)="selectTab('heatmap')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Mapa de Calor
+    </button>
+  </div>
+
+  <!-- Contenido de las tabs -->
+  <div class="tab-content">
+    <!-- Tab General -->
+    <div *ngIf="activeTab === 'general'" class="content-section">
+      <div class="charts-grid">
+        <!-- Top Alumnos -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>Top 10 Alumnos por Horas de Vuelo</h3>
+          </div>
+          <div class="card-body">
+            <div *ngIf="loadingTopAlumnos" class="loading-small">
+              <div class="spinner-small"></div>
+            </div>
+            <div *ngIf="!loadingTopAlumnos && topAlumnos.length > 0" class="ranking-list">
+              <div *ngFor="let alumno of topAlumnos; let i = index" class="ranking-item">
+                <div class="ranking-position" [class.top-3]="i < 3">{{ i + 1 }}</div>
+                <div class="ranking-info">
+                  <span class="ranking-name">{{ alumno.nombre }} {{ alumno.apellido }}</span>
+                  <span class="ranking-details">{{ alumno.total_vuelos }} vuelos</span>
+                </div>
+                <div class="ranking-hours">
+                  <span class="hours-value">{{ alumno.total_horas }}</span>
+                  <span class="hours-label">hrs</span>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!loadingTopAlumnos && topAlumnos.length === 0" class="empty-chart">
+              No hay datos disponibles
+            </div>
+          </div>
+        </div>
+
+        <!-- Tendencia de Vuelos -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>Tendencia de Vuelos (Últimos 30 días)</h3>
+          </div>
+          <div class="card-body">
+            <div *ngIf="loadingTendencia" class="loading-small">
+              <div class="spinner-small"></div>
+            </div>
+            <div *ngIf="!loadingTendencia && tendenciaVuelos.length > 0" class="chart-simple">
+              <div *ngFor="let dia of tendenciaVuelos" class="bar-item">
+                <div class="bar-container">
+                  <div 
+                    class="bar-fill" 
+                    [style.height.%]="(dia.total / getMaxTendencia()) * 100"
+                    [title]="dia.fecha + ': ' + dia.total + ' vuelos'">
+                  </div>
+                </div>
+                <span class="bar-label">{{ formatShortDate(dia.fecha) }}</span>
+              </div>
+            </div>
+            <div *ngIf="!loadingTendencia && tendenciaVuelos.length === 0" class="empty-chart">
+              No hay datos disponibles
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Tutores -->
+    <div *ngIf="activeTab === 'tutores'" class="content-section">
+      <div class="chart-card">
+        <div class="card-header">
+          <h3>Rendimiento por Tutor</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loadingTutores" class="loading-small">
+            <div class="spinner-small"></div>
+          </div>
+          <div *ngIf="!loadingTutores && vuelosPorTutor.length > 0" class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Tutor</th>
+                  <th>Total Vuelos</th>
+                  <th>Horas Totales</th>
+                  <th>Promedio Horas/Vuelo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of vuelosPorTutor">
+                  <td class="font-bold">{{ item.tutor.nombre }} {{ item.tutor.apellido }}</td>
+                  <td>{{ item.total_vuelos }}</td>
+                  <td>{{ item.total_horas || 0 }} hrs</td>
+                  <td>{{ getPromedio(item.total_horas, item.total_vuelos) }} hrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!loadingTutores && vuelosPorTutor.length === 0" class="empty-chart">
+            No hay datos disponibles
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Alumnos -->
+    <div *ngIf="activeTab === 'alumnos'" class="content-section">
+      <div class="chart-card">
+        <div class="card-header">
+          <h3>Progreso de Alumnos</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loadingAlumnos" class="loading-small">
+            <div class="spinner-small"></div>
+          </div>
+          <div *ngIf="!loadingAlumnos && vuelosPorAlumno.length > 0" class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Alumno</th>
+                  <th>Total Vuelos</th>
+                  <th>Horas Totales</th>
+                  <th>Promedio Horas/Vuelo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of vuelosPorAlumno">
+                  <td class="font-bold">{{ item.alumno.nombre }} {{ item.alumno.apellido }}</td>
+                  <td>{{ item.total_vuelos }}</td>
+                  <td>{{ item.total_horas || 0 }} hrs</td>
+                  <td>{{ getPromedio(item.total_horas, item.total_vuelos) }} hrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!loadingAlumnos && vuelosPorAlumno.length === 0" class="empty-chart">
+            No hay datos disponibles
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Avionetas -->
+    <div *ngIf="activeTab === 'avionetas'" class="content-section">
+      <div class="chart-card">
+        <div class="card-header">
+          <h3>Uso de Avionetas</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loadingAvionetas" class="loading-small">
+            <div class="spinner-small"></div>
+          </div>
+          <div *ngIf="!loadingAvionetas && usoAvionetas.length > 0" class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Avioneta</th>
+                  <th>Modelo</th>
+                  <th>Total Vuelos</th>
+                  <th>Horas Totales</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of usoAvionetas">
+                  <td class="font-bold">{{ item.avioneta.codigo }}</td>
+                  <td>{{ item.avioneta.modelo }}</td>
+                  <td>{{ item.total_vuelos }}</td>
+                  <td>{{ item.total_horas || 0 }} hrs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!loadingAvionetas && usoAvionetas.length === 0" class="empty-chart">
+            No hay datos disponibles
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Mapa de Calor -->
+    <div *ngIf="activeTab === 'heatmap'" class="content-section">
+      <div class="chart-card">
+        <div class="card-header">
+          <h3>Mapa de Calor de Horarios</h3>
+          <p class="card-subtitle">Visualiza los horarios más concurridos</p>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loadingHeatmap" class="loading-small">
+            <div class="spinner-small"></div>
+          </div>
+          <div *ngIf="!loadingHeatmap && mapaCalor" class="heatmap-container">
+            <div class="heatmap-grid">
+              <div class="heatmap-header">
+                <div class="hour-label"></div>
+                <div *ngFor="let dia of diasSemana" class="day-label">{{ dia }}</div>
+              </div>
+              <div *ngFor="let hora of horas" class="heatmap-row">
+                <div class="hour-label">{{ hora }}</div>
+                <div 
+                  *ngFor="let dia of diasSemana" 
+                  class="heatmap-cell"
+                  [class.heatmap-low]="getHeatValue(dia, hora) > 0 && getHeatValue(dia, hora) <= 2"
+                  [class.heatmap-medium]="getHeatValue(dia, hora) > 2 && getHeatValue(dia, hora) <= 5"
+                  [class.heatmap-high]="getHeatValue(dia, hora) > 5"
+                  [title]="dia + ' ' + hora + ': ' + getHeatValue(dia, hora) + ' vuelos'">
+                  <span *ngIf="getHeatValue(dia, hora) > 0">{{ getHeatValue(dia, hora) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="heatmap-legend">
+              <span>Menor actividad</span>
+              <div class="legend-scale">
+                <div class="legend-item heatmap-low"></div>
+                <div class="legend-item heatmap-medium"></div>
+                <div class="legend-item heatmap-high"></div>
+              </div>
+              <span>Mayor actividad</span>
+            </div>
+          </div>
+          <div *ngIf="!loadingHeatmap && !mapaCalor" class="empty-chart">
+            No hay datos disponibles
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

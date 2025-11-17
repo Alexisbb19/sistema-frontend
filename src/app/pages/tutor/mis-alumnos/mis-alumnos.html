@@ -1,0 +1,202 @@
+<div class="mis-alumnos-container">
+  <!-- Estadísticas Generales -->
+  <div class="stats-grid">
+    <div class="stat-card stat-total">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ totalAlumnos }}</h3>
+        <p class="stat-label">Total Alumnos</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-activos">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ alumnosActivos }}</h3>
+        <p class="stat-label">Alumnos Activos</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-promedio">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ promedioGeneral | number:'1.1-1' }}</h3>
+        <p class="stat-label">Promedio General</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-horas">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{ horasTotales | number:'1.1-1' }}</h3>
+        <p class="stat-label">Horas Totales</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="search-section">
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Buscar alumno por nombre, apellido o correo..."
+        class="search-input"
+      />
+      <button *ngIf="searchTerm" class="btn-clear-search" (click)="clearSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando alumnos...</p>
+  </div>
+
+  <!-- Lista de Alumnos -->
+  <div *ngIf="!loading" class="alumnos-grid">
+    <div *ngFor="let alumno of alumnosFiltrados" class="alumno-card">
+      <!-- Header del Card -->
+      <div class="card-header">
+        <div class="alumno-avatar">
+          {{ getInitials(alumno.nombre, alumno.apellido) }}
+        </div>
+        <div class="alumno-info">
+          <h3 class="alumno-nombre">{{ alumno.nombre }} {{ alumno.apellido }}</h3>
+          <p class="alumno-correo">{{ alumno.correo }}</p>
+          <p class="alumno-telefono" *ngIf="alumno.telefono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            {{ alumno.telefono }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="card-stats">
+        <div class="stat-item">
+          <span class="stat-number">{{ alumno.estadisticas.total_vuelos }}</span>
+          <span class="stat-text">Vuelos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ alumno.estadisticas.vuelos_completados }}</span>
+          <span class="stat-text">Completados</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{{ alumno.estadisticas.horas_totales | number:'1.1-1' }}</span>
+          <span class="stat-text">Horas</span>
+        </div>
+      </div>
+
+      <!-- Calificación -->
+      <div class="calificacion-section" *ngIf="alumno.estadisticas.promedio_calificacion > 0">
+        <div class="calificacion-header">
+          <span class="calificacion-label">Calificación Promedio</span>
+          <span class="calificacion-numero" [ngClass]="getCalificacionClass(alumno.estadisticas.promedio_calificacion)">
+            {{ alumno.estadisticas.promedio_calificacion | number:'1.1-1' }}
+          </span>
+        </div>
+        <div class="stars-container">
+          <span *ngFor="let star of getStars(alumno.estadisticas.promedio_calificacion)" 
+                [ngClass]="'star-' + star">
+            ★
+          </span>
+        </div>
+      </div>
+
+      <!-- Próximo Vuelo -->
+      <div class="proximo-vuelo" *ngIf="alumno.estadisticas.proximo_vuelo">
+        <div class="proximo-vuelo-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Próximo Vuelo</span>
+        </div>
+        <div class="proximo-vuelo-info">
+          <p class="fecha">{{ formatDate(alumno.estadisticas.proximo_vuelo.fecha) }}</p>
+          <p class="hora">{{ alumno.estadisticas.proximo_vuelo.hora_inicio }}</p>
+          <p class="avioneta" *ngIf="alumno.estadisticas.proximo_vuelo.avioneta">
+            {{ alumno.estadisticas.proximo_vuelo.avioneta }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Último Vuelo -->
+      <div class="ultimo-vuelo" *ngIf="alumno.estadisticas.ultimo_vuelo && !alumno.estadisticas.proximo_vuelo">
+        <div class="ultimo-vuelo-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Último Vuelo</span>
+        </div>
+        <div class="ultimo-vuelo-info">
+          <p class="fecha">{{ formatDate(alumno.estadisticas.ultimo_vuelo.fecha) }}</p>
+          <span class="estado-badge" [ngClass]="'estado-' + alumno.estadisticas.ultimo_vuelo.estado.toLowerCase().replace(' ', '-')">
+            {{ alumno.estadisticas.ultimo_vuelo.estado }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Botón de acción -->
+      <div class="card-footer">
+        <button class="btn-ver-progreso" (click)="verProgreso(alumno.id_usuario)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="22" y1="12" x2="2" y2="12"/>
+            <polyline points="15 19 22 12 15 5"/>
+          </svg>
+          Ver Progreso Completo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && alumnosFiltrados.length === 0" class="empty-state">
+    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <h3>{{ searchTerm ? 'No se encontraron alumnos' : 'No tienes alumnos asignados' }}</h3>
+    <p>{{ searchTerm ? 'Intenta con otro término de búsqueda' : 'Los alumnos asignados a ti aparecerán aquí' }}</p>
+    <button *ngIf="searchTerm" class="btn-secondary" (click)="clearSearch()">
+      Limpiar búsqueda
+    </button>
+  </div>
+</div>

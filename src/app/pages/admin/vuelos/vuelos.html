@@ -1,0 +1,371 @@
+<div class="vuelos-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Gestión de Vuelos
+      </h1>
+      <p class="page-description">Programa y administra los vuelos de práctica</p>
+    </div>
+    <button class="btn-primary" (click)="openModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Programar Vuelo
+    </button>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Fecha:</label>
+        <input
+          type="date"
+          [(ngModel)]="filterFecha"
+          (change)="onFilterChange()"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Estado:</label>
+        <select [(ngModel)]="filterEstado" (change)="onFilterChange()" class="filter-select">
+          <option value="">Todos</option>
+          <option value="Programado">Programados</option>
+          <option value="En Curso">En Curso</option>
+          <option value="Completado">Completados</option>
+          <option value="Cancelado">Cancelados</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Alumno:</label>
+        <select [(ngModel)]="filterAlumnoId" (change)="onFilterChange()" class="filter-select">
+          <option value="">Todos</option>
+          <option *ngFor="let alumno of alumnos" [value]="alumno.id_usuario">
+            {{ alumno.nombre }} {{ alumno.apellido }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Tutor:</label>
+        <select [(ngModel)]="filterTutorId" (change)="onFilterChange()" class="filter-select">
+          <option value="">Todos</option>
+          <option *ngFor="let tutor of tutores" [value]="tutor.id_usuario">
+            {{ tutor.nombre }} {{ tutor.apellido }}
+          </option>
+        </select>
+      </div>
+
+      <button class="btn-clear-filters" (click)="clearFilters()" *ngIf="hasActiveFilters()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        Limpiar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando vuelos...</p>
+  </div>
+
+  <!-- Timeline de vuelos -->
+  <div *ngIf="!loading" class="vuelos-timeline">
+    <div *ngFor="let vuelo of vuelos" class="vuelo-card" [ngClass]="getCardClass(vuelo.estado)">
+      <div class="card-left-bar"></div>
+      
+      <div class="card-header">
+        <div class="card-date-time">
+          <div class="date-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>{{ formatDate(vuelo.fecha) }}</span>
+          </div>
+          <div class="time-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>{{ vuelo.hora_inicio }} - {{ vuelo.hora_fin || 'N/A' }}</span>
+          </div>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(vuelo.estado)">
+          {{ vuelo.estado }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <div class="info-content">
+              <span class="info-label">Alumno</span>
+              <span class="info-value">{{ vuelo.alumno?.nombre }} {{ vuelo.alumno?.apellido }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <div class="info-content">
+              <span class="info-label">Tutor</span>
+              <span class="info-value">{{ vuelo.tutor?.nombre }} {{ vuelo.tutor?.apellido }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+              <path d="M12 8v8M8 12h8"/>
+            </svg>
+            <div class="info-content">
+              <span class="info-label">Avioneta</span>
+              <span class="info-value">{{ vuelo.avioneta?.codigo }} - {{ vuelo.avioneta?.modelo }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="vuelo.horas_voladas">
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <div class="info-content">
+              <span class="info-label">Horas Voladas</span>
+              <span class="info-value">{{ vuelo.horas_voladas }} hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="vuelo.observaciones" class="observaciones">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p>{{ vuelo.observaciones }}</p>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-card btn-edit" (click)="openModal(vuelo)" *ngIf="vuelo.estado !== 'Completado'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </button>
+
+        <button 
+          class="btn-card btn-status"
+          [ngClass]="getNextStatusButtonClass(vuelo.estado)"
+          (click)="cambiarEstado(vuelo)"
+          *ngIf="vuelo.estado !== 'Completado' && vuelo.estado !== 'Cancelado'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          {{ getNextStatusText(vuelo.estado) }}
+        </button>
+
+        <button 
+          class="btn-card btn-cancel"
+          (click)="cancelarVuelo(vuelo)"
+          *ngIf="vuelo.estado === 'Programado'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          Cancelar
+        </button>
+
+        <button 
+          class="btn-card btn-delete" 
+          (click)="deleteVuelo(vuelo)"
+          *ngIf="vuelo.estado !== 'Completado'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && vuelos.length === 0" class="empty-state">
+    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    <h3>No hay vuelos programados</h3>
+    <p>Comienza programando un nuevo vuelo de práctica</p>
+  </div>
+</div>
+
+<!-- Modal de Crear/Editar Vuelo -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Editar Vuelo' : 'Programar Vuelo' }}</h2>
+      <button class="btn-close" (click)="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="vueloForm" (ngSubmit)="onSubmit()" class="modal-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Alumno *</label>
+          <select
+            formControlName="alumno_id"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('alumno_id')"
+          >
+            <option value="">Seleccione un alumno</option>
+            <option *ngFor="let alumno of alumnos" [value]="alumno.id_usuario">
+              {{ alumno.nombre }} {{ alumno.apellido }}
+            </option>
+          </select>
+          <span class="error-text" *ngIf="isFieldInvalid('alumno_id')">
+            El alumno es requerido
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tutor *</label>
+          <select
+            formControlName="tutor_id"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('tutor_id')"
+          >
+            <option value="">Seleccione un tutor</option>
+            <option *ngFor="let tutor of tutores" [value]="tutor.id_usuario">
+              {{ tutor.nombre }} {{ tutor.apellido }}
+            </option>
+          </select>
+          <span class="error-text" *ngIf="isFieldInvalid('tutor_id')">
+            El tutor es requerido
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Avioneta *</label>
+        <select
+          formControlName="avioneta_id"
+          class="form-input"
+          [class.input-error]="isFieldInvalid('avioneta_id')"
+        >
+          <option value="">Seleccione una avioneta</option>
+          <option *ngFor="let avioneta of avionetasActivas" [value]="avioneta.id_avioneta">
+            {{ avioneta.codigo }} - {{ avioneta.modelo }}
+          </option>
+        </select>
+        <span class="error-text" *ngIf="isFieldInvalid('avioneta_id')">
+          La avioneta es requerida
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha *</label>
+          <input
+            type="date"
+            formControlName="fecha"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('fecha')"
+          />
+          <span class="error-text" *ngIf="isFieldInvalid('fecha')">
+            La fecha es requerida
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hora Inicio *</label>
+          <input
+            type="time"
+            formControlName="hora_inicio"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('hora_inicio')"
+          />
+          <span class="error-text" *ngIf="isFieldInvalid('hora_inicio')">
+            La hora de inicio es requerida
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Hora Fin</label>
+          <input
+            type="time"
+            formControlName="hora_fin"
+            class="form-input"
+          />
+          <span class="form-hint">Opcional - Se puede agregar después del vuelo</span>
+        </div>
+
+        <div class="form-group" *ngIf="isEditMode">
+          <label class="form-label">Estado *</label>
+          <select
+            formControlName="estado"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('estado')"
+          >
+            <option value="Programado">Programado</option>
+            <option value="En Curso">En Curso</option>
+            <option value="Completado">Completado</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea
+          formControlName="observaciones"
+          class="form-input"
+          rows="4"
+          placeholder="Notas sobre el vuelo, objetivos, condiciones climáticas, etc..."
+        ></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          <span *ngIf="!submitting">{{ isEditMode ? 'Actualizar' : 'Programar' }}</span>
+          <span *ngIf="submitting" class="btn-loading">
+            <span class="spinner-small"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

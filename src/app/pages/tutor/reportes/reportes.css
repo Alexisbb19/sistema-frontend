@@ -1,0 +1,504 @@
+/* reportes.css */
+.reportes-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.reportes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-info h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.header-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.btn-exportar {
+  padding: 0.75rem 1.5rem;
+  background: #ec4899;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-exportar:hover {
+  background: #db2777;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+}
+
+.btn-exportar svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f4f6;
+  border-top-color: #ec4899;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Stats Principales */
+.stats-principales {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card-reporte {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card-reporte:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon-reporte {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-total-vuelos .stat-icon-reporte {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.stat-horas .stat-icon-reporte {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.stat-calificacion .stat-icon-reporte {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.stat-icon-reporte svg {
+  width: 28px;
+  height: 28px;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.stat-content-reporte {
+  flex: 1;
+}
+
+.stat-numero {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin: 0 0 0.5rem 0;
+}
+
+.stat-label-reporte {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.stat-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.breakdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.breakdown-item .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.breakdown-item.completados .dot {
+  background: #10b981;
+}
+
+.breakdown-item.programados .dot {
+  background: #3b82f6;
+}
+
+.stat-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-bar-reporte {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill-reporte {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.stars-container-reporte {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 1.25rem;
+}
+
+.star-full { color: #fbbf24; }
+.star-half { color: #fbbf24; opacity: 0.5; }
+.star-empty { color: #d1d5db; }
+
+/* Section Cards */
+.section-card-reporte {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.section-header-reporte {
+  margin-bottom: 1.5rem;
+}
+
+.section-title-reporte {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.section-title-reporte svg {
+  width: 20px;
+  height: 20px;
+  color: #ec4899;
+  stroke-width: 2;
+}
+
+/* Vuelos por Mes */
+.vuelos-mes-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.mes-card {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.mes-card:hover {
+  background: #f3f4f6;
+}
+
+.mes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.mes-nombre {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.mes-cantidad {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.mes-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mes-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ec4899, #db2777);
+  transition: width 0.3s ease;
+}
+
+/* Ranking de Alumnos */
+.alumnos-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.ranking-item:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
+}
+
+.ranking-position {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.position-1 {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+}
+
+.position-2 {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  color: white;
+}
+
+.position-3 {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+}
+
+.ranking-position:not(.position-1):not(.position-2):not(.position-3) {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+.ranking-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ranking-nombre {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.ranking-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ranking-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.ranking-stat svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ranking-calificacion {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+/* Resumen Mensual */
+.resumen-mensual {
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  color: white;
+}
+
+.resumen-mensual .section-title-reporte {
+  color: white;
+}
+
+.resumen-mensual .section-title-reporte svg {
+  color: white;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.resumen-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.resumen-item svg {
+  width: 40px;
+  height: 40px;
+  stroke: white;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.resumen-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.resumen-label {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.resumen-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Empty State */
+.empty-chart {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #9ca3af;
+}
+
+.empty-chart svg {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  stroke: #d1d5db;
+  stroke-width: 1.5;
+}
+
+.empty-chart p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reportes-container {
+    padding: 1rem;
+  }
+
+  .reportes-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-exportar {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-principales {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card-reporte {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .resumen-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ranking-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ranking-stats {
+    justify-content: center;
+  }
+}
