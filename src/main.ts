@@ -17,6 +17,8 @@ import { VueloService } from './app/services/vuelo';
 import { ReporteService } from './app/services/reporte';
 import { NotificacionService } from './app/services/notificacion';
 import { BitacoraService } from './app/services/bitacora'
+import { TutorAlumnoService } from './app/services/tutor-alumno';
+import { TutorDisponibilidadService } from './app/services/tutor-disponibilidad'; 
 
 // Guards
 import { AuthGuard } from './app/guards/auth-guard';
@@ -34,6 +36,9 @@ import { VuelosComponent } from './app/pages/admin/vuelos/vuelos';
 import { ReportesComponent } from './app/pages/admin/reportes/reportes';
 import { TutorLayoutComponent } from './app/pages/tutor/layout/layout';
 import { TutorMisVuelosComponent } from './app/pages/tutor/mis-vuelos/mis-vuelos';
+import { TutorProgresoAlumnoComponent } from './app/pages/tutor/progreso-alumno/progreso-alumno'
+import { TutorReportesComponent } from './app/pages/tutor/reportes/reportes'
+import { TutorReportarFallasComponent } from './app/pages/tutor/reportar-fallas/reportar-fallas'
 ;
 
 
@@ -56,7 +61,9 @@ bootstrapApplication(AppComponent, {
     ReporteService,
     NotificacionService,
     BitacoraService,
-    // Guard
+    TutorAlumnoService,
+    TutorDisponibilidadService,
+        // Guard
     AuthGuard,
     // Interceptor
     {

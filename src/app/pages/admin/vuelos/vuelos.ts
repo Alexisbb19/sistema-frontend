@@ -81,7 +81,7 @@ export class VuelosComponent implements OnInit {
     });
   }
 
-  loadAlumnos(): void {
+  loadUsuarios(): void {
     this.usuarioService.getUsuarios({ rol: 'Alumno', activo: true }).subscribe({
       next: (usuarios) => {
         this.alumnos = usuarios;
@@ -99,6 +99,17 @@ export class VuelosComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar tutores:', error);
+      }
+    });
+  }
+
+  loadAlumnos(): void {
+    this.usuarioService.getAlumnos().subscribe({
+      next: (alumnos) => {
+        this.alumnos = alumnos;
+      },
+      error: (error) => {
+        console.error('Error al cargar alumnos:', error);
       }
     });
   }

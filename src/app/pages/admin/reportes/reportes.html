@@ -1,5 +1,5 @@
 <div class="reportes-container">
-  <!-- Header -->
+  <!-- Header con acciones -->
   <div class="page-header">
     <div class="header-left">
       <h1 class="page-title">
@@ -10,6 +10,73 @@
       </h1>
       <p class="page-description">Visualiza estadísticas detalladas y métricas de rendimiento</p>
     </div>
+    <div class="header-actions">
+      <button class="btn-filter" (click)="toggleFilters()" [class.active]="showFilters">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+        </svg>
+        Filtros
+      </button>
+      <button class="btn-export btn-pdf" (click)="exportPDF()" *ngIf="activeTab !== 'general'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        </svg>
+        Exportar PDF
+      </button>
+      <button class="btn-export btn-excel" (click)="exportExcel()" *ngIf="activeTab !== 'general'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Exportar Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel de Filtros -->
+  <div class="filters-panel" *ngIf="showFilters">
+    <div class="filters-content">
+      <div class="filter-group">
+        <label>Fecha Inicio</label>
+        <input type="date" [(ngModel)]="filtros.fecha_inicio" class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>Fecha Fin</label>
+        <input type="date" [(ngModel)]="filtros.fecha_fin" class="filter-input">
+      </div>
+      <div class="filter-group" *ngIf="activeTab !== 'general' && activeTab !== 'heatmap'">
+        <label>Buscar</label>
+        <input 
+          type="text" 
+          [(ngModel)]="filtros.search" 
+          (input)="onSearch($event)"
+          placeholder="Buscar por nombre..." 
+          class="filter-input">
+      </div>
+      <div class="filter-group" *ngIf="activeTab !== 'general' && activeTab !== 'heatmap'">
+        <label>Registros por página</label>
+        <select [(ngModel)]="filtros.per_page" class="filter-input">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-apply" (click)="applyFilters()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Aplicar Filtros
+        </button>
+        <button class="btn-reset" (click)="resetFilters()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Resetear
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Tabs de navegación -->
@@ -17,7 +84,7 @@
     <button 
       class="tab-button" 
       [class.active]="activeTab === 'general'"
-      (click)="activeTab = 'general'">
+      (click)="selectTab('general')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <rect x="3" y="3" width="7" height="7"/>
         <rect x="14" y="3" width="7" height="7"/>
@@ -144,25 +211,65 @@
           <div *ngIf="loadingTutores" class="loading-small">
             <div class="spinner-small"></div>
           </div>
-          <div *ngIf="!loadingTutores && vuelosPorTutor.length > 0" class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Tutor</th>
-                  <th>Total Vuelos</th>
-                  <th>Horas Totales</th>
-                  <th>Promedio Horas/Vuelo</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of vuelosPorTutor">
-                  <td class="font-bold">{{ item.tutor.nombre }} {{ item.tutor.apellido }}</td>
-                  <td>{{ item.total_vuelos }}</td>
-                  <td>{{ item.total_horas || 0 }} hrs</td>
-                  <td>{{ getPromedio(item.total_horas, item.total_vuelos) }} hrs</td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="!loadingTutores && vuelosPorTutor.length > 0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th (click)="changeSort('tutor.nombre')" class="sortable">
+                      Tutor
+                      <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M7 10l5 5 5-5"/>
+                      </svg>
+                    </th>
+                    <th (click)="changeSort('total_vuelos')" class="sortable">
+                      Total Vuelos
+                      <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M7 10l5 5 5-5"/>
+                      </svg>
+                    </th>
+                    <th (click)="changeSort('total_horas')" class="sortable">
+                      Horas Totales
+                      <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M7 10l5 5 5-5"/>
+                      </svg>
+                    </th>
+                    <th>Promedio hrs/Vuelo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of vuelosPorTutor">
+                    <td class="font-bold">{{ item.tutor.nombre }} {{ item.tutor.apellido }}</td>
+                    <td>{{ item.total_vuelos }}</td>
+                    <td>{{ item.total_horas || 0 }} hrs</td>
+                    <td>{{ item.promedio_horas?.toFixed(2) || '0.00' }} hrs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Paginación -->
+            <div class="pagination" *ngIf="totalPagesTutores > 1">
+              <button 
+                class="pagination-btn" 
+                (click)="loadVuelosPorTutor(currentPageTutores - 1)"
+                [disabled]="currentPageTutores === 1">
+                Anterior
+              </button>
+              <button 
+                *ngFor="let page of getPageNumbers(currentPageTutores, totalPagesTutores)"
+                class="pagination-btn"
+                [class.active]="page === currentPageTutores"
+                (click)="loadVuelosPorTutor(page)">
+                {{ page }}
+              </button>
+              <button 
+                class="pagination-btn" 
+                (click)="loadVuelosPorTutor(currentPageTutores + 1)"
+                [disabled]="currentPageTutores === totalPagesTutores">
+                Siguiente
+              </button>
+            </div>
           </div>
           <div *ngIf="!loadingTutores && vuelosPorTutor.length === 0" class="empty-chart">
             No hay datos disponibles
@@ -171,7 +278,7 @@
       </div>
     </div>
 
-    <!-- Tab Alumnos -->
+    <!-- Tab Alumnos (similar estructura) -->
     <div *ngIf="activeTab === 'alumnos'" class="content-section">
       <div class="chart-card">
         <div class="card-header">
@@ -181,25 +288,49 @@
           <div *ngIf="loadingAlumnos" class="loading-small">
             <div class="spinner-small"></div>
           </div>
-          <div *ngIf="!loadingAlumnos && vuelosPorAlumno.length > 0" class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Alumno</th>
-                  <th>Total Vuelos</th>
-                  <th>Horas Totales</th>
-                  <th>Promedio Horas/Vuelo</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of vuelosPorAlumno">
-                  <td class="font-bold">{{ item.alumno.nombre }} {{ item.alumno.apellido }}</td>
-                  <td>{{ item.total_vuelos }}</td>
-                  <td>{{ item.total_horas || 0 }} hrs</td>
-                  <td>{{ getPromedio(item.total_horas, item.total_vuelos) }} hrs</td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="!loadingAlumnos && vuelosPorAlumno.length > 0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th (click)="changeSort('alumno.nombre')" class="sortable">Alumno</th>
+                    <th (click)="changeSort('total_vuelos')" class="sortable">Total Vuelos</th>
+                    <th (click)="changeSort('total_horas')" class="sortable">Horas Totales</th>
+                    <th>Promedio hrs/Vuelo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of vuelosPorAlumno">
+                    <td class="font-bold">{{ item.alumno.nombre }} {{ item.alumno.apellido }}</td>
+                    <td>{{ item.total_vuelos }}</td>
+                    <td>{{ item.total_horas || 0 }} hrs</td>
+                    <td>{{ item.promedio_horas?.toFixed(2) || '0.00' }} hrs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="pagination" *ngIf="totalPagesAlumnos > 1">
+              <button 
+                class="pagination-btn" 
+                (click)="loadVuelosPorAlumno(currentPageAlumnos - 1)"
+                [disabled]="currentPageAlumnos === 1">
+                Anterior
+              </button>
+              <button 
+                *ngFor="let page of getPageNumbers(currentPageAlumnos, totalPagesAlumnos)"
+                class="pagination-btn"
+                [class.active]="page === currentPageAlumnos"
+                (click)="loadVuelosPorAlumno(page)">
+                {{ page }}
+              </button>
+              <button 
+                class="pagination-btn" 
+                (click)="loadVuelosPorAlumno(currentPageAlumnos + 1)"
+                [disabled]="currentPageAlumnos === totalPagesAlumnos">
+                Siguiente
+              </button>
+            </div>
           </div>
           <div *ngIf="!loadingAlumnos && vuelosPorAlumno.length === 0" class="empty-chart">
             No hay datos disponibles
@@ -208,7 +339,7 @@
       </div>
     </div>
 
-    <!-- Tab Avionetas -->
+    <!-- Tab Avionetas (similar estructura) -->
     <div *ngIf="activeTab === 'avionetas'" class="content-section">
       <div class="chart-card">
         <div class="card-header">
@@ -218,25 +349,49 @@
           <div *ngIf="loadingAvionetas" class="loading-small">
             <div class="spinner-small"></div>
           </div>
-          <div *ngIf="!loadingAvionetas && usoAvionetas.length > 0" class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Avioneta</th>
-                  <th>Modelo</th>
-                  <th>Total Vuelos</th>
-                  <th>Horas Totales</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of usoAvionetas">
-                  <td class="font-bold">{{ item.avioneta.codigo }}</td>
-                  <td>{{ item.avioneta.modelo }}</td>
-                  <td>{{ item.total_vuelos }}</td>
-                  <td>{{ item.total_horas || 0 }} hrs</td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="!loadingAvionetas && usoAvionetas.length > 0">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th (click)="changeSort('avioneta.codigo')" class="sortable">Avioneta</th>
+                    <th>Modelo</th>
+                    <th (click)="changeSort('total_vuelos')" class="sortable">Total Vuelos</th>
+                    <th (click)="changeSort('total_horas')" class="sortable">Horas Totales</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of usoAvionetas">
+                    <td class="font-bold">{{ item.avioneta.codigo }}</td>
+                    <td>{{ item.avioneta.modelo }}</td>
+                    <td>{{ item.total_vuelos }}</td>
+                    <td>{{ item.total_horas || 0 }} hrs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="pagination" *ngIf="totalPagesAvionetas > 1">
+              <button 
+                class="pagination-btn" 
+                (click)="loadUsoAvionetas(currentPageAvionetas - 1)"
+                [disabled]="currentPageAvionetas === 1">
+                Anterior
+              </button>
+              <button 
+                *ngFor="let page of getPageNumbers(currentPageAvionetas, totalPagesAvionetas)"
+                class="pagination-btn"
+                [class.active]="page === currentPageAvionetas"
+                (click)="loadUsoAvionetas(page)">
+                {{ page }}
+              </button>
+              <button 
+                class="pagination-btn" 
+                (click)="loadUsoAvionetas(currentPageAvionetas + 1)"
+                [disabled]="currentPageAvionetas === totalPagesAvionetas">
+                Siguiente
+              </button>
+            </div>
           </div>
           <div *ngIf="!loadingAvionetas && usoAvionetas.length === 0" class="empty-chart">
             No hay datos disponibles

@@ -67,6 +67,10 @@ export class UsuarioService {
     return this.http.get<Usuario[]>(`${this.apiUrl}/usuarios-tutores`);
   }
 
+  getAlumnos(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/usuarios-alumnos`);
+  }
+
   createUsuario(usuario: UsuarioCreate): Observable<{ message: string; usuario: Usuario }> {
     return this.http.post<{ message: string; usuario: Usuario }>(`${this.apiUrl}/usuarios`, usuario);
   }
