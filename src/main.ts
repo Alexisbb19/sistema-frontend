@@ -19,6 +19,7 @@ import { NotificacionService } from './app/services/notificacion';
 import { BitacoraService } from './app/services/bitacora'
 import { TutorAlumnoService } from './app/services/tutor-alumno';
 import { TutorDisponibilidadService } from './app/services/tutor-disponibilidad'; 
+import { AlumnoService } from './app/services/alumno'; 
 
 // Guards
 import { AuthGuard } from './app/guards/auth-guard';
@@ -63,6 +64,7 @@ bootstrapApplication(AppComponent, {
     BitacoraService,
     TutorAlumnoService,
     TutorDisponibilidadService,
+    AlumnoService,
         // Guard
     AuthGuard,
     // Interceptor

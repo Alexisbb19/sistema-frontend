@@ -35,7 +35,9 @@ export class UsuariosComponent implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       correo: ['', [Validators.required, Validators.email]],
-      telefono: [''],
+      telefono: ['', [
+        Validators.pattern(/^[0-9]{4}-[0-9]{4}$/)
+      ]],
       rol: ['', Validators.required],
       tutor_asignado_id: [''],
       password: [''],

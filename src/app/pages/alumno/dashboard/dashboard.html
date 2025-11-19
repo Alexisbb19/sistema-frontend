@@ -1,0 +1,291 @@
+<div class="dashboard-alumno-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando tu información...</p>
+  </div>
+
+  <!-- Contenido -->
+  <div *ngIf="!loading && dashboard" class="dashboard-content">
+    <!-- Estadísticas Principales -->
+    <div class="stats-grid">
+      <div class="stat-card stat-vuelos">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value">{{ dashboard.estadisticas.vuelos_completados }}</h3>
+          <p class="stat-label">Vuelos Completados</p>
+          <span class="stat-detail">de {{ dashboard.estadisticas.total_vuelos }} totales</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-horas">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value">{{ dashboard.estadisticas.horas_totales | number:'1.1-1' }}</h3>
+          <p class="stat-label">Horas de Vuelo</p>
+          <span class="stat-detail">acumuladas</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-calificacion">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value" [style.color]="getCalificacionColor(dashboard.estadisticas.promedio_calificacion)">
+            {{ dashboard.estadisticas.promedio_calificacion | number:'1.1-1' }}
+          </h3>
+          <p class="stat-label">Promedio General</p>
+          <div class="stars-small">
+            <span *ngFor="let star of getStars(dashboard.estadisticas.promedio_calificacion)" 
+                  [ngClass]="'star-' + star">★</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-programados">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-value">{{ dashboard.estadisticas.vuelos_programados }}</h3>
+          <p class="stat-label">Vuelos Programados</p>
+          <span class="stat-detail">próximamente</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Próximo Vuelo -->
+    <div class="section-card proximo-vuelo-card" *ngIf="dashboard.proximo_vuelo">
+      <div class="card-header-section">
+        <h3 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Tu Próximo Vuelo
+        </h3>
+        <button class="btn-action-small" (click)="verMisVuelos()">
+          Ver Todos
+        </button>
+      </div>
+
+      <div class="proximo-vuelo-content">
+        <div class="vuelo-main-info">
+          <div class="fecha-hora-grande">
+            <div class="fecha-display">
+              <span class="dia-numero">{{ dashboard.proximo_vuelo.fecha | date:'d' }}</span>
+              <div class="mes-anio">
+                <span class="mes">{{ dashboard.proximo_vuelo.fecha | date:'MMM' }}</span>
+                <span class="anio">{{ dashboard.proximo_vuelo.fecha | date:'yyyy' }}</span>
+              </div>
+            </div>
+            <div class="hora-display">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>{{ dashboard.proximo_vuelo.hora_inicio }}</span>
+            </div>
+          </div>
+
+          <div class="vuelo-details-grid">
+            <div class="detail-item">
+              <div class="detail-icon tutor-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <div class="detail-info">
+                <span class="detail-label">Tutor</span>
+                <span class="detail-value">{{ dashboard.proximo_vuelo.tutor?.nombre }} {{ dashboard.proximo_vuelo.tutor?.apellido }}</span>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-icon avioneta-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M2 22L12 2l10 20H2z" transform="rotate(90 12 12)"/>
+                </svg>
+              </div>
+              <div class="detail-info">
+                <span class="detail-label">Avioneta</span>
+                <span class="detail-value">{{ dashboard.proximo_vuelo.avioneta?.codigo }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vuelo-countdown">
+          <div class="countdown-box">
+            <span class="countdown-label">Tiempo restante</span>
+            <span class="countdown-value">{{ formatDate(dashboard.proximo_vuelo.fecha) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin próximo vuelo -->
+    <div class="section-card empty-proximo" *ngIf="!dashboard.proximo_vuelo">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <h4>No tienes vuelos programados</h4>
+      <p>Comunícate con tu tutor para programar tu próximo vuelo</p>
+    </div>
+
+    <!-- Grid de 2 columnas -->
+    <div class="two-column-grid">
+      <!-- Último Vuelo -->
+      <div class="section-card ultimo-vuelo-card" *ngIf="dashboard.ultimo_vuelo">
+        <div class="card-header-section">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Último Vuelo
+          </h3>
+          <button class="btn-action-small" (click)="verHistorial()">
+            Ver Historial
+          </button>
+        </div>
+
+        <div class="ultimo-vuelo-content">
+          <div class="vuelo-info-row">
+            <span class="info-label">Fecha:</span>
+            <span class="info-value">{{ formatDate(dashboard.ultimo_vuelo.fecha) }}</span>
+          </div>
+
+          <div class="vuelo-info-row">
+            <span class="info-label">Tutor:</span>
+            <span class="info-value">{{ dashboard.ultimo_vuelo.tutor?.nombre }} {{ dashboard.ultimo_vuelo.tutor?.apellido }}</span>
+          </div>
+
+          <div class="vuelo-info-row" *ngIf="dashboard.ultimo_vuelo.horas_voladas">
+            <span class="info-label">Duración:</span>
+            <span class="info-value">{{ dashboard.ultimo_vuelo.horas_voladas }} horas</span>
+          </div>
+
+          <div class="bitacora-preview" *ngIf="dashboard.ultimo_vuelo.bitacora">
+            <div class="calificacion-badge" [style.background-color]="getCalificacionColor(dashboard.ultimo_vuelo.bitacora.calificacion_general)">
+              <span class="calificacion-numero">{{ dashboard.ultimo_vuelo.bitacora.calificacion_general }}</span>
+              <span class="calificacion-text">Calificación</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progresión -->
+      <div class="section-card progresion-card">
+        <div class="card-header-section">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            Tu Progresión
+          </h3>
+          <button class="btn-action-small" (click)="verProgreso()">
+            Ver Detalles
+          </button>
+        </div>
+
+        <div class="progresion-content" *ngIf="dashboard.progresion_calificaciones.length > 0">
+          <div class="progresion-chart">
+            <div *ngFor="let punto of dashboard.progresion_calificaciones.slice(-5)" class="chart-bar">
+              <div class="bar-fill" 
+                   [style.height.%]="(punto.calificacion / 5) * 100"
+                   [style.background-color]="getCalificacionColor(punto.calificacion)">
+              </div>
+              <span class="bar-value">{{ punto.calificacion }}</span>
+              <span class="bar-label">{{ punto.fecha | date:'dd/MM' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-progresion" *ngIf="dashboard.progresion_calificaciones.length === 0">
+          <p>Completa tus primeros vuelos para ver tu progresión</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vuelos por Mes -->
+    <div class="section-card vuelos-mes-card">
+      <h3 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Actividad de los Últimos 6 Meses
+      </h3>
+
+      <div class="meses-grid">
+        <div *ngFor="let mes of dashboard.vuelos_por_mes" class="mes-item">
+          <div class="mes-header">
+            <span class="mes-nombre">{{ mes.mes }}</span>
+            <span class="mes-cantidad">{{ mes.cantidad }}</span>
+          </div>
+          <div class="mes-bar">
+            <div class="mes-bar-fill" 
+                 [style.width.%]="mes.cantidad > 0 ? (mes.cantidad / 10) * 100 : 0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="acciones-rapidas">
+      <button class="accion-card" (click)="verMisVuelos()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span>Ver Horario Semanal</span>
+      </button>
+
+      <button class="accion-card" (click)="verHistorial()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <span>Consultar Historial</span>
+      </button>
+
+      <button class="accion-card" (click)="verProgreso()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span>Ver Mi Progreso</span>
+      </button>
+    </div>
+  </div>
+</div>

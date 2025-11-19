@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { VueloService, Vuelo } from '../../../services/vuelo';
-import { UsuarioService, Usuario } from '../../../services/usuario';
-import { AvionetaService, Avioneta } from '../../../services/avioneta';
+import { VueloService, Vuelo, UsuarioBusqueda, AvionetaBusqueda } from '../../../services/vuelo';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
 
 @Component({
   selector: 'app-vuelos',
@@ -16,9 +16,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class VuelosComponent implements OnInit {
   vuelos: Vuelo[] = [];
-  alumnos: Usuario[] = [];
-  tutores: Usuario[] = [];
-  avionetasActivas: Avioneta[] = [];
   
   loading = false;
   submitting = false;
@@ -26,18 +23,42 @@ export class VuelosComponent implements OnInit {
   isEditMode = false;
   selectedVuelo: Vuelo | null = null;
 
+  // Paginación
+  currentPage = 1;
+  totalPages = 1;
+  perPage = 10;
+  totalVuelos = 0;
+
   // Filtros
   filterFecha = '';
   filterEstado = '';
-  filterAlumnoId = '';
-  filterTutorId = '';
+  filterSearch = '';
+
+  // Autocompletado
+  searchAlumnoSubject = new Subject<string>();
+  searchTutorSubject = new Subject<string>();
+  searchAvionetaSubject = new Subject<string>();
+  
+  alumnosResults: UsuarioBusqueda[] = [];
+  tutoresResults: UsuarioBusqueda[] = [];
+  avionetasResults: AvionetaBusqueda[] = [];
+  
+  showAlumnosDropdown = false;
+  showTutoresDropdown = false;
+  showAvionetasDropdown = false;
+
+  selectedAlumno: UsuarioBusqueda | null = null;
+  selectedTutor: UsuarioBusqueda | null = null;
+  selectedAvioneta: AvionetaBusqueda | null = null;
+
+  searchAlumnoText = '';
+  searchTutorText = '';
+  searchAvionetaText = '';
 
   vueloForm: FormGroup;
 
   constructor(
     private vueloService: VueloService,
-    private usuarioService: UsuarioService,
-    private avionetaService: AvionetaService,
     private fb: FormBuilder
   ) {
     this.vueloForm = this.fb.group({
@@ -54,23 +75,73 @@ export class VuelosComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVuelos();
-    this.loadAlumnos();
-    this.loadTutores();
-    this.loadAvionetasActivas();
+    this.setupAutocompletado();
   }
 
-  loadVuelos(): void {
+  setupAutocompletado(): void {
+    // Autocompletado para alumnos
+    this.searchAlumnoSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (term.length < 2) {
+          return of([]);
+        }
+        return this.vueloService.buscarUsuarios(term, 'Alumno');
+      })
+    ).subscribe(results => {
+      this.alumnosResults = results;
+      this.showAlumnosDropdown = results.length > 0;
+    });
+
+    // Autocompletado para tutores
+    this.searchTutorSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (term.length < 2) {
+          return of([]);
+        }
+        return this.vueloService.buscarUsuarios(term, 'Tutor');
+      })
+    ).subscribe(results => {
+      this.tutoresResults = results;
+      this.showTutoresDropdown = results.length > 0;
+    });
+
+    // Autocompletado para avionetas
+    this.searchAvionetaSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (term.length < 2) {
+          return of([]);
+        }
+        return this.vueloService.buscarAvionetas(term);
+      })
+    ).subscribe(results => {
+      this.avionetasResults = results;
+      this.showAvionetasDropdown = results.length > 0;
+    });
+  }
+
+  loadVuelos(page: number = 1): void {
     this.loading = true;
-    const filters: any = {};
+    const filters: any = {
+      page,
+      per_page: this.perPage
+    };
     
     if (this.filterFecha) filters.fecha = this.filterFecha;
     if (this.filterEstado) filters.estado = this.filterEstado;
-    if (this.filterAlumnoId) filters.alumno_id = parseInt(this.filterAlumnoId);
-    if (this.filterTutorId) filters.tutor_id = parseInt(this.filterTutorId);
+    if (this.filterSearch) filters.search = this.filterSearch;
 
     this.vueloService.getVuelos(filters).subscribe({
-      next: (vuelos) => {
-        this.vuelos = vuelos;
+      next: (response) => {
+        this.vuelos = response.data;
+        this.currentPage = response.current_page;
+        this.totalPages = response.last_page;
+        this.totalVuelos = response.total;
         this.loading = false;
       },
       error: (error) => {
@@ -81,64 +152,93 @@ export class VuelosComponent implements OnInit {
     });
   }
 
-  loadUsuarios(): void {
-    this.usuarioService.getUsuarios({ rol: 'Alumno', activo: true }).subscribe({
-      next: (usuarios) => {
-        this.alumnos = usuarios;
-      },
-      error: (error) => {
-        console.error('Error al cargar alumnos:', error);
-      }
-    });
-  }
-
-  loadTutores(): void {
-    this.usuarioService.getTutores().subscribe({
-      next: (tutores) => {
-        this.tutores = tutores;
-      },
-      error: (error) => {
-        console.error('Error al cargar tutores:', error);
-      }
-    });
-  }
-
-  loadAlumnos(): void {
-    this.usuarioService.getAlumnos().subscribe({
-      next: (alumnos) => {
-        this.alumnos = alumnos;
-      },
-      error: (error) => {
-        console.error('Error al cargar alumnos:', error);
-      }
-    });
-  }
-
-  loadAvionetasActivas(): void {
-    this.avionetaService.getAvionetas({ estado: 'Activo' }).subscribe({
-      next: (avionetas) => {
-        this.avionetasActivas = avionetas;
-      },
-      error: (error) => {
-        console.error('Error al cargar avionetas:', error);
-      }
-    });
-  }
-
   onFilterChange(): void {
+    this.currentPage = 1;
     this.loadVuelos();
+  }
+
+  onSearchChange(event: any): void {
+    this.filterSearch = event.target.value;
+    setTimeout(() => {
+      if (this.filterSearch === event.target.value) {
+        this.onFilterChange();
+      }
+    }, 500);
   }
 
   clearFilters(): void {
     this.filterFecha = '';
     this.filterEstado = '';
-    this.filterAlumnoId = '';
-    this.filterTutorId = '';
+    this.filterSearch = '';
+    this.currentPage = 1;
     this.loadVuelos();
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.filterFecha || this.filterEstado || this.filterAlumnoId || this.filterTutorId);
+    return !!(this.filterFecha || this.filterEstado || this.filterSearch);
+  }
+
+  // Autocompletado de Alumnos
+  onSearchAlumno(event: any): void {
+    const term = event.target.value;
+    this.searchAlumnoText = term;
+    this.searchAlumnoSubject.next(term);
+  }
+
+  selectAlumno(alumno: UsuarioBusqueda): void {
+    this.selectedAlumno = alumno;
+    this.searchAlumnoText = `${alumno.nombre} ${alumno.apellido}`;
+    this.vueloForm.patchValue({ alumno_id: alumno.id_usuario });
+    this.showAlumnosDropdown = false;
+  }
+
+  clearAlumno(): void {
+    this.selectedAlumno = null;
+    this.searchAlumnoText = '';
+    this.vueloForm.patchValue({ alumno_id: '' });
+    this.alumnosResults = [];
+  }
+
+  // Autocompletado de Tutores
+  onSearchTutor(event: any): void {
+    const term = event.target.value;
+    this.searchTutorText = term;
+    this.searchTutorSubject.next(term);
+  }
+
+  selectTutor(tutor: UsuarioBusqueda): void {
+    this.selectedTutor = tutor;
+    this.searchTutorText = `${tutor.nombre} ${tutor.apellido}`;
+    this.vueloForm.patchValue({ tutor_id: tutor.id_usuario });
+    this.showTutoresDropdown = false;
+  }
+
+  clearTutor(): void {
+    this.selectedTutor = null;
+    this.searchTutorText = '';
+    this.vueloForm.patchValue({ tutor_id: '' });
+    this.tutoresResults = [];
+  }
+
+  // Autocompletado de Avionetas
+  onSearchAvioneta(event: any): void {
+    const term = event.target.value;
+    this.searchAvionetaText = term;
+    this.searchAvionetaSubject.next(term);
+  }
+
+  selectAvioneta(avioneta: AvionetaBusqueda): void {
+    this.selectedAvioneta = avioneta;
+    this.searchAvionetaText = `${avioneta.codigo} - ${avioneta.modelo}`;
+    this.vueloForm.patchValue({ avioneta_id: avioneta.id_avioneta });
+    this.showAvionetasDropdown = false;
+  }
+
+  clearAvioneta(): void {
+    this.selectedAvioneta = null;
+    this.searchAvionetaText = '';
+    this.vueloForm.patchValue({ avioneta_id: '' });
+    this.avionetasResults = [];
   }
 
   openModal(vuelo?: Vuelo): void {
@@ -157,9 +257,44 @@ export class VuelosComponent implements OnInit {
         estado: vuelo.estado,
         observaciones: vuelo.observaciones
       });
+
+      // Precargar datos en los campos de búsqueda
+      if (vuelo.alumno) {
+        this.selectedAlumno = {
+          id_usuario: vuelo.alumno.id_usuario,
+          nombre: vuelo.alumno.nombre,
+          apellido: vuelo.alumno.apellido,
+          correo: vuelo.alumno.correo,
+          rol: 'Alumno'
+        };
+        this.searchAlumnoText = `${vuelo.alumno.nombre} ${vuelo.alumno.apellido}`;
+      }
+
+      if (vuelo.tutor) {
+        this.selectedTutor = {
+          id_usuario: vuelo.tutor.id_usuario,
+          nombre: vuelo.tutor.nombre,
+          apellido: vuelo.tutor.apellido,
+          correo: vuelo.tutor.correo,
+          rol: 'Tutor'
+        };
+        this.searchTutorText = `${vuelo.tutor.nombre} ${vuelo.tutor.apellido}`;
+      }
+
+      if (vuelo.avioneta) {
+        this.selectedAvioneta = {
+          id_avioneta: vuelo.avioneta.id_avioneta,
+          codigo: vuelo.avioneta.codigo,
+          modelo: vuelo.avioneta.modelo,
+          estado: vuelo.avioneta.estado
+        };
+        this.searchAvionetaText = `${vuelo.avioneta.codigo} - ${vuelo.avioneta.modelo}`;
+      }
     } else {
       this.vueloForm.reset({ estado: 'Programado' });
-      // Establecer fecha mínima como hoy
+      this.clearAlumno();
+      this.clearTutor();
+      this.clearAvioneta();
       const today = new Date().toISOString().split('T')[0];
       this.vueloForm.patchValue({ fecha: today });
     }
@@ -170,6 +305,9 @@ export class VuelosComponent implements OnInit {
     this.isEditMode = false;
     this.selectedVuelo = null;
     this.vueloForm.reset({ estado: 'Programado' });
+    this.clearAlumno();
+    this.clearTutor();
+    this.clearAvioneta();
   }
 
   onSubmit(): void {
@@ -197,7 +335,7 @@ export class VuelosComponent implements OnInit {
       next: (response) => {
         this.submitting = false;
         this.closeModal();
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -221,7 +359,7 @@ export class VuelosComponent implements OnInit {
 
     this.vueloService.cambiarEstado(vuelo.id_vuelo, nuevoEstado).subscribe({
       next: (response) => {
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -238,7 +376,7 @@ export class VuelosComponent implements OnInit {
 
     this.vueloService.cambiarEstado(vuelo.id_vuelo, 'Cancelado').subscribe({
       next: (response) => {
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -255,7 +393,7 @@ export class VuelosComponent implements OnInit {
 
     this.vueloService.deleteVuelo(vuelo.id_vuelo).subscribe({
       next: (response) => {
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -264,6 +402,31 @@ export class VuelosComponent implements OnInit {
         alert(message);
       }
     });
+  }
+
+  // Paginación
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.loadVuelos(page);
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
   }
 
   isFieldInvalid(fieldName: string): boolean {

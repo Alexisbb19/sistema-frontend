@@ -220,7 +220,12 @@
             formControlName="telefono"
             class="form-input"
             placeholder="0000-0000"
+            [class.input-error]="isFieldInvalid('telefono')"
           />
+
+          <span class="error-text" *ngIf="isFieldInvalid('telefono')">
+              El teléfono debe tener el formato 0000-0000.
+          </span>
         </div>
       </div>
 

@@ -20,9 +20,20 @@
     </button>
   </div>
 
-  <!-- Filtros y búsqueda -->
+   <!-- Filtros y búsqueda -->
   <div class="filters-section">
     <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Búsqueda General:</label>
+        <input
+          type="text"
+          [(ngModel)]="filterSearch"
+          (input)="onSearchChange($event)"
+          placeholder="Buscar por alumno, tutor o avioneta..."
+          class="filter-input"
+        />
+      </div>
+
       <div class="filter-group">
         <label class="filter-label">Fecha:</label>
         <input
@@ -44,26 +55,6 @@
         </select>
       </div>
 
-      <div class="filter-group">
-        <label class="filter-label">Alumno:</label>
-        <select [(ngModel)]="filterAlumnoId" (change)="onFilterChange()" class="filter-select">
-          <option value="">Todos</option>
-          <option *ngFor="let alumno of alumnos" [value]="alumno.id_usuario">
-            {{ alumno.nombre }} {{ alumno.apellido }}
-          </option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Tutor:</label>
-        <select [(ngModel)]="filterTutorId" (change)="onFilterChange()" class="filter-select">
-          <option value="">Todos</option>
-          <option *ngFor="let tutor of tutores" [value]="tutor.id_usuario">
-            {{ tutor.nombre }} {{ tutor.apellido }}
-          </option>
-        </select>
-      </div>
-
       <button class="btn-clear-filters" (click)="clearFilters()" *ngIf="hasActiveFilters()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -71,6 +62,22 @@
         </svg>
         Limpiar Filtros
       </button>
+    </div>
+  </div>
+
+  <!-- Info de resultados -->
+  <div class="results-info" *ngIf="!loading">
+    <span class="results-count">
+      Mostrando {{ vuelos.length }} de {{ totalVuelos }} vuelos
+    </span>
+    <div class="per-page-selector">
+      <label>Registros por página:</label>
+      <select [(ngModel)]="perPage" (change)="onFilterChange()" class="filter-select-small">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
     </div>
   </div>
 
@@ -212,6 +219,31 @@
     </div>
   </div>
 
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="!loading && totalPages > 1">
+    <button 
+      class="pagination-btn" 
+      (click)="goToPage(currentPage - 1)"
+      [disabled]="currentPage === 1">
+      ← Anterior
+    </button>
+    
+    <button 
+      *ngFor="let page of getPageNumbers()"
+      class="pagination-btn"
+      [class.active]="page === currentPage"
+      (click)="goToPage(page)">
+      {{ page }}
+    </button>
+    
+    <button 
+      class="pagination-btn" 
+      (click)="goToPage(currentPage + 1)"
+      [disabled]="currentPage === totalPages">
+      Siguiente →
+    </button>
+  </div>
+
   <!-- Empty state -->
   <div *ngIf="!loading && vuelos.length === 0" class="empty-state">
     <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -237,54 +269,124 @@
     </div>
 
     <form [formGroup]="vueloForm" (ngSubmit)="onSubmit()" class="modal-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Alumno *</label>
-          <select
-            formControlName="alumno_id"
+      <!-- Búsqueda de Alumno con Autocompletado -->
+      <div class="form-group autocomplete-group">
+        <label class="form-label">Alumno *</label>
+        <div class="autocomplete-wrapper">
+          <input
+            type="text"
+            [(ngModel)]="searchAlumnoText"
+            [ngModelOptions]="{standalone: true}"
+            (input)="onSearchAlumno($event)"
+            placeholder="Buscar alumno por nombre..."
             class="form-input"
             [class.input-error]="isFieldInvalid('alumno_id')"
-          >
-            <option value="">Seleccione un alumno</option>
-            <option *ngFor="let alumno of alumnos" [value]="alumno.id_usuario">
-              {{ alumno.nombre }} {{ alumno.apellido }}
-            </option>
-          </select>
-          <span class="error-text" *ngIf="isFieldInvalid('alumno_id')">
-            El alumno es requerido
-          </span>
+          />
+          <button 
+            type="button" 
+            class="clear-btn" 
+            *ngIf="selectedAlumno"
+            (click)="clearAlumno()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="autocomplete-dropdown" *ngIf="showAlumnosDropdown && alumnosResults.length > 0">
+            <div 
+              *ngFor="let alumno of alumnosResults" 
+              class="autocomplete-item"
+              (click)="selectAlumno(alumno)">
+              <div class="item-content">
+                <span class="item-name">{{ alumno.nombre }} {{ alumno.apellido }}</span>
+                <span class="item-email">{{ alumno.correo }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Tutor *</label>
-          <select
-            formControlName="tutor_id"
-            class="form-input"
-            [class.input-error]="isFieldInvalid('tutor_id')"
-          >
-            <option value="">Seleccione un tutor</option>
-            <option *ngFor="let tutor of tutores" [value]="tutor.id_usuario">
-              {{ tutor.nombre }} {{ tutor.apellido }}
-            </option>
-          </select>
-          <span class="error-text" *ngIf="isFieldInvalid('tutor_id')">
-            El tutor es requerido
-          </span>
-        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('alumno_id')">
+          El alumno es requerido
+        </span>
       </div>
 
-      <div class="form-group">
+      <!-- Búsqueda de Tutor con Autocompletado -->
+      <div class="form-group autocomplete-group">
+        <label class="form-label">Tutor *</label>
+        <div class="autocomplete-wrapper">
+          <input
+            type="text"
+            [(ngModel)]="searchTutorText"
+            [ngModelOptions]="{standalone: true}"
+            (input)="onSearchTutor($event)"
+            placeholder="Buscar tutor por nombre..."
+            class="form-input"
+            [class.input-error]="isFieldInvalid('tutor_id')"
+          />
+          <button 
+            type="button" 
+            class="clear-btn" 
+            *ngIf="selectedTutor"
+            (click)="clearTutor()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="autocomplete-dropdown" *ngIf="showTutoresDropdown && tutoresResults.length > 0">
+            <div 
+              *ngFor="let tutor of tutoresResults" 
+              class="autocomplete-item"
+              (click)="selectTutor(tutor)">
+              <div class="item-content">
+                <span class="item-name">{{ tutor.nombre }} {{ tutor.apellido }}</span>
+                <span class="item-email">{{ tutor.correo }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('tutor_id')">
+          El tutor es requerido
+        </span>
+      </div>
+
+      <!-- Búsqueda de Avioneta con Autocompletado -->
+      <div class="form-group autocomplete-group">
         <label class="form-label">Avioneta *</label>
-        <select
-          formControlName="avioneta_id"
-          class="form-input"
-          [class.input-error]="isFieldInvalid('avioneta_id')"
-        >
-          <option value="">Seleccione una avioneta</option>
-          <option *ngFor="let avioneta of avionetasActivas" [value]="avioneta.id_avioneta">
-            {{ avioneta.codigo }} - {{ avioneta.modelo }}
-          </option>
-        </select>
+        <div class="autocomplete-wrapper">
+          <input
+            type="text"
+            [(ngModel)]="searchAvionetaText"
+            [ngModelOptions]="{standalone: true}"
+            (input)="onSearchAvioneta($event)"
+            placeholder="Buscar avioneta por código o modelo..."
+            class="form-input"
+            [class.input-error]="isFieldInvalid('avioneta_id')"
+          />
+          <button 
+            type="button" 
+            class="clear-btn" 
+            *ngIf="selectedAvioneta"
+            (click)="clearAvioneta()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div class="autocomplete-dropdown" *ngIf="showAvionetasDropdown && avionetasResults.length > 0">
+            <div 
+              *ngFor="let avioneta of avionetasResults" 
+              class="autocomplete-item"
+              (click)="selectAvioneta(avioneta)">
+              <div class="item-content">
+                <span class="item-name">{{ avioneta.codigo }}</span>
+                <span class="item-email">{{ avioneta.modelo }}</span>
+              </div>
+              <span class="item-badge" [class.badge-active]="avioneta.estado === 'Activo'">
+                {{ avioneta.estado }}
+              </span>
+            </div>
+          </div>
+        </div>
         <span class="error-text" *ngIf="isFieldInvalid('avioneta_id')">
           La avioneta es requerida
         </span>

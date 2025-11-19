@@ -23,6 +23,12 @@ export class TutorMisVuelosComponent implements OnInit {
   showBitacoraModal = false;
   selectedVuelo: Vuelo | null = null;
 
+  // Paginación
+  currentPage = 1;
+  totalPages = 1;
+  perPage = 10;
+  totalVuelos = 0;
+
   // Maniobras
   maniobrasList: Maniobra[] = [];
   maniobrasSeleccionadas: string[] = [];
@@ -87,17 +93,31 @@ export class TutorMisVuelosComponent implements OnInit {
     });
   }
 
-  loadVuelos(): void {
+  loadVuelos(page: number = 1): void {
     this.loading = true;
-    const filters: any = {};
+    const filters: any = {
+      paginate: true,
+      per_page: this.perPage,
+      page
+    };
     
     if (this.filterFecha) filters.fecha = this.filterFecha;
     if (this.filterEstado) filters.estado = this.filterEstado;
 
     this.vueloService.getMisVuelos(filters).subscribe({
-      next: (vuelos) => {
-        this.vuelos = vuelos;
-        this.calculateStats(vuelos);
+      next: (response: any) => {
+        if (response.data) {
+          // Respuesta paginada
+          this.vuelos = response.data;
+          this.currentPage = response.current_page;
+          this.totalPages = response.last_page;
+          this.totalVuelos = response.total;
+          this.calculateStatsFromPaginated(response.data);
+        } else {
+          // Respuesta sin paginar (fallback)
+          this.vuelos = response;
+          this.calculateStats(response);
+        }
         this.loading = false;
       },
       error: (error) => {
@@ -132,18 +152,70 @@ export class TutorMisVuelosComponent implements OnInit {
     this.vuelosPendientes = vuelos.filter(v => v.estado === 'Programado').length;
   }
 
+  calculateStatsFromPaginated(vuelos: Vuelo[]): void {
+    // Para datos paginados, solo calculamos sobre la página actual
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    this.vuelosHoy = vuelos.filter(v => {
+      const vueloDate = new Date(v.fecha);
+      vueloDate.setHours(0, 0, 0, 0);
+      return vueloDate.getTime() === today.getTime();
+    }).length;
+
+    this.vuelosSemana = vuelos.filter(v => {
+      const vueloDate = new Date(v.fecha);
+      return vueloDate >= startOfWeek && vueloDate <= endOfWeek;
+    }).length;
+
+    this.vuelosPendientes = vuelos.filter(v => v.estado === 'Programado').length;
+  }
+
   onFilterChange(): void {
+    this.currentPage = 1;
     this.loadVuelos();
   }
 
   clearFilters(): void {
     this.filterFecha = '';
     this.filterEstado = '';
+    this.currentPage = 1;
     this.loadVuelos();
   }
 
   hasActiveFilters(): boolean {
     return !!(this.filterFecha || this.filterEstado);
+  }
+
+  // Paginación
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.loadVuelos(page);
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
   }
 
   iniciarVuelo(vuelo: Vuelo): void {
@@ -156,7 +228,7 @@ export class TutorMisVuelosComponent implements OnInit {
       observaciones: vuelo.observaciones
     }).subscribe({
       next: (response) => {
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -170,7 +242,6 @@ export class TutorMisVuelosComponent implements OnInit {
     this.selectedVuelo = vuelo;
     this.showCompletarModal = true;
     
-    // Pre-llenar la hora de fin con la hora actual
     const now = new Date();
     const horaActual = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     
@@ -201,7 +272,7 @@ export class TutorMisVuelosComponent implements OnInit {
       next: (response) => {
         this.submitting = false;
         this.closeModal();
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -217,14 +288,14 @@ export class TutorMisVuelosComponent implements OnInit {
     const mensaje = `¿Está seguro de cancelar el vuelo con ${vuelo.alumno?.nombre} ${vuelo.alumno?.apellido}?`;
     const observaciones = prompt(mensaje + '\n\nMotivo de cancelación (opcional):');
     
-    if (observaciones === null) return; // Usuario canceló el prompt
+    if (observaciones === null) return;
 
     this.vueloService.actualizarEstadoTutor(vuelo.id_vuelo, {
       estado: 'Cancelado',
       observaciones: observaciones || 'Cancelado por el tutor'
     }).subscribe({
       next: (response) => {
-        this.loadVuelos();
+        this.loadVuelos(this.currentPage);
         alert(response.message);
       },
       error: (error) => {
@@ -260,7 +331,6 @@ ${vuelo.observaciones ? `\nObservaciones:\n${vuelo.observaciones}` : ''}
     this.showBitacoraModal = true;
     this.maniobrasSeleccionadas = [];
     
-    // Cargar bitácora existente si hay
     this.bitacoraService.getBitacora(vuelo.id_vuelo).subscribe({
       next: (bitacora) => {
         if (bitacora) {
@@ -269,7 +339,6 @@ ${vuelo.observaciones ? `\nObservaciones:\n${vuelo.observaciones}` : ''}
         }
       },
       error: (error) => {
-        // Si no existe bitácora, iniciar en blanco
         this.bitacoraForm.reset({
           numero_despegues: 0,
           numero_aterrizajes: 0,

@@ -148,6 +148,7 @@ export class ReporteService {
     return this.http.get<MapaCalor>(`${this.apiUrl}/mapa-calor-horarios`, { params });
   }
 
+
   getVuelosPorMes(): Observable<VueloPorMes[]> {
     return this.http.get<VueloPorMes[]>(`${this.apiUrl}/vuelos-por-mes`);
   }

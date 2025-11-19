@@ -15,6 +15,11 @@ import { TutorMisAlumnosComponent } from './pages/tutor/mis-alumnos/mis-alumnos'
 import { TutorProgresoAlumnoComponent } from './pages/tutor/progreso-alumno/progreso-alumno';
 import { TutorReportesComponent } from './pages/tutor/reportes/reportes';
 import { TutorReportarFallasComponent } from './pages/tutor/reportar-fallas/reportar-fallas';
+import { AlumnoHistorialComponent } from './pages/alumno/historial/historial';
+import { AlumnoMiProgresoComponent } from './pages/alumno/mi-progreso/mi-progreso';
+import { AlumnoMisVuelosComponent } from './pages/alumno/mis-vuelos/mis-vuelos';
+import { AlumnoDashboardComponent } from './pages/alumno/dashboard/dashboard';
+import { AlumnoLayoutComponent } from './pages/alumno/layout/layout';
 
 
 export const routes: Routes = [
@@ -90,6 +95,35 @@ export const routes: Routes = [
       {
         path: 'reportar-fallas',
         component: TutorReportarFallasComponent
+      }
+    ]
+  },
+  {
+    path: 'alumno',
+    component: AlumnoLayoutComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['Alumno'] },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        component: AlumnoDashboardComponent
+      },
+      {
+        path: 'mis-vuelos',
+        component: AlumnoMisVuelosComponent
+      },
+      {
+        path: 'mi-progreso',
+        component: AlumnoMiProgresoComponent
+      },
+      {
+        path: 'historial',
+        component: AlumnoHistorialComponent
       }
     ]
   }

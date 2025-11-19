@@ -86,6 +86,22 @@
     </div>
   </div>
 
+  <!-- NUEVO: Info de resultados y selector de registros por página -->
+  <div class="results-info" *ngIf="!loading">
+    <span class="results-count">
+      Mostrando {{ vuelos.length }} de {{ totalVuelos }} vuelos
+    </span>
+    <div class="per-page-selector">
+      <label>Registros por página:</label>
+      <select [(ngModel)]="perPage" (change)="onFilterChange()" class="filter-select-small">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+    </div>
+  </div>
+
   <!-- Loading -->
   <div *ngIf="loading" class="loading-container">
     <div class="spinner"></div>
@@ -221,6 +237,32 @@
       </div>
     </div>
   </div>
+
+  <!-- NUEVO: Paginación -->
+  <div class="pagination" *ngIf="!loading && totalPages > 1">
+    <button 
+      class="pagination-btn" 
+      (click)="goToPage(currentPage - 1)"
+      [disabled]="currentPage === 1">
+      ← Anterior
+    </button>
+    
+    <button 
+      *ngFor="let page of getPageNumbers()"
+      class="pagination-btn"
+      [class.active]="page === currentPage"
+      (click)="goToPage(page)">
+      {{ page }}
+    </button>
+    
+    <button 
+      class="pagination-btn" 
+      (click)="goToPage(currentPage + 1)"
+      [disabled]="currentPage === totalPages">
+      Siguiente →
+    </button>
+  </div>
+
 
   <!-- Empty state -->
   <div *ngIf="!loading && vuelos.length === 0" class="empty-state">

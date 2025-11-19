@@ -61,7 +61,8 @@ export class TutorReportesComponent implements OnInit {
     
     // Cargar vuelos del tutor
     this.vueloService.getMisVuelos().subscribe({
-      next: (vuelos) => {
+      next: (resp) => {
+        const vuelos = Array.isArray(resp) ? resp : resp.data;
         this.processVuelosData(vuelos);
         this.loading = false;
       },
